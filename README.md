@@ -1,4 +1,8 @@
-# Nova Conductor
+# Nova Conductor Workflows
+
+Experimental development fork of [Nova Conductor](https://github.com/InversoLabs/nova-conductor), starting from v0.3.4. Custom templates are not implemented yet; the inherited coding workflow remains functional. See [WORKFLOW-DESIGN.md](WORKFLOW-DESIGN.md) for the design and staged implementation plan.
+
+For the current coding release, use the parent repository.
 
 Give Conductor a prompt. A planner writes the project instructions and build
 plan, a builder implements it, and a reviewer checks the result. When it needs
