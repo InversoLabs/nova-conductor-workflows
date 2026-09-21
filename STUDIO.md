@@ -16,6 +16,8 @@ The office shows the selected project's real role and status. An idle draft is e
 
 Run workflow creates a project from your prompt and a frozen workflow snapshot. Optionally select an existing code folder: Conductor copies it into a separate workspace. Model overrides on individual roles take precedence over the project model.
 
+Starting or continuing a workflow or one-shot automatically opens the native Codex terminal alongside Studio. The same viewer follows fresh role sessions as the workflow advances.
+
 Projects offers Continue, Pause, guidance while paused, Stop, Reopen at a role, Files, and Native Codex. Public completed agent messages, tool results, and file changes appear in activity; Native Codex opens the existing terminal viewer for its full supported presentation. The web UI does not duplicate token-by-token terminal output or private reasoning.
 
 Provider settings are global and shared with the CLI. Projects do not silently select another provider. API keys entered in the UI are transient and passed only to the launched process. Saved settings contain the key environment-variable name, not its value.

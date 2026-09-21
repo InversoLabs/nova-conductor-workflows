@@ -29,7 +29,7 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
   async function start(root,key){
     stopped(root);if([...jobs.values()].some(j=>j.child&&j.child.exitCode===null))throw Error('Another UI run is active. Stop it before starting another.');
     const provider=loadProvider(),secret=key||providerKey(provider);const env={...process.env};if(provider.keyEnv)env[provider.keyEnv]=secret;
-    const child=(launch||((root,env)=>spawn(process.execPath,[path.join(base,'src/conductor.mjs'),'run',root,'--headless'],{env,windowsHide:true,stdio:['ignore','pipe','pipe']})))(root,env);
+    const child=(launch||((root,env)=>spawn(process.execPath,[path.join(base,'src/conductor.mjs'),'run',root],{env,windowsHide:true,stdio:['ignore','pipe','pipe']})))(root,env);
     const job={child,secret};jobs.set(projectId(root),job);
     const output=data=>fs.appendFileSync(path.join(root,'ui-controller.log'),redact(data));child.stdout?.on('data',output);child.stderr?.on('data',output);
     child.once('error',error=>{output(error.message);job.secret='';});child.once('close',()=>{job.secret='';});return {started:true};
