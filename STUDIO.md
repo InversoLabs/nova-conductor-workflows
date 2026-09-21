@@ -20,7 +20,7 @@ Starting or continuing a workflow or one-shot automatically opens the native Cod
 
 Projects offers Continue, Pause, guidance while paused, Stop, Reopen at a role, Files, and Native Codex. Public completed agent messages, tool results, and file changes appear in activity; Native Codex opens the existing terminal viewer for its full supported presentation. The web UI does not duplicate token-by-token terminal output or private reasoning.
 
-Provider settings are global and shared with the CLI. Projects do not silently select another provider. API keys entered in the UI are transient and passed only to the launched process. Saved settings contain the key environment-variable name, not its value.
+Provider settings are global and shared with the CLI. Projects do not silently select another provider. API keys entered in a run form are transient and passed only to the launched process. The Schedules page can explicitly store an unattended key using Windows DPAPI. Saved settings contain the key environment-variable name, not its value.
 
 Closing the browser window leaves runs available to reconnect. To stop a worker, use **Stop** and wait for its status to settle. Use **Quit Conductor** to close the UI server; it refuses while a UI-owned run remains active. Existing CLI runs remain independently managed.
 
@@ -29,3 +29,9 @@ Closing the browser window leaves runs available to reconnect. To stop a worker,
 The main suite passed 56 tests. All three opt-in native Codex tests passed using simulated provider responses, including proxy patch compatibility and workflow/one-shot execution. Playwright exercised node movement, connection validation, saved workflows and agents, project creation, pause, steering, reopen, global settings, and mobile layout using an isolated controller fixture. No live model quality or completion claim is implied.
 
 Run `npm test`. For native checks set `CONDUCTOR_NATIVE_TEST=1` and run `node --test --test-concurrency=1 test/native-provider.test.mjs test/native-gemma.test.mjs test/native-workflows.test.mjs`. For browser checks provide Playwright externally via `PLAYWRIGHT_MODULE` and run `node test/ui-browser.cjs`; Edge is the default browser, overridable with `BROWSER_EXE`.
+
+## Robots and schedules
+
+Add Script robot on the canvas, choose an executable and a JSON argument array, set its timeout, then connect its Finished route. `{workspace}` and `{project}` expand to the current paths. Programs run without shell interpolation; use an explicit PowerShell or other interpreter for scripts. A nonzero exit holds the workflow for attention by default. You can explicitly connect a failure route back to an agent for repairs; publishing robots use the default hold to avoid automatic replay of side effects.
+
+Schedules saves a workflow snapshot, instructions, model, daily times, and time zone. Each edition gets a fresh project. Newsroom provides a live publishing example with headline selection and reviewed JSON draft uploads. See [newsroom/README.md](newsroom/README.md).

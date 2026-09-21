@@ -11,6 +11,7 @@ while ($true) {
     if (-not (Test-Path -LiteralPath $stateFile)) { Start-Sleep -Milliseconds 500; continue }
     $s=Get-Content -LiteralPath $stateFile -Raw | ConvertFrom-Json
     if ($s.done) { Write-Host "Conductor: $($s.status)" -ForegroundColor Cyan; Read-Host 'Press Enter to close'; exit }
+    if($s.robot -and $last -ne ('robot:'+ $s.role)){ $last='robot:'+ $s.role; Write-Host "`n$($s.role) | Script robot is executing. Follow output in Studio." -ForegroundColor Yellow }
     if ($s.threadId -and $s.threadId -ne $last) {
         $last=$s.threadId
         if(-not $attachAttempts.ContainsKey($last)){$attachAttempts[$last]=0}

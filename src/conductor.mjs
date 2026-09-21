@@ -1,3 +1,4 @@
+import {runRobot} from './robots.mjs';
 import {checkpoint,customWorkflow,currentRole,workflowPrompt,assertWorkflowChanges,workflowOutcome,initializeWorkflow,validateTemplate,loadTemplate,loadAgent,oneShot,listLibrary,saveLibrary} from './templates.mjs';
 import {importProject} from './import-project.mjs';
 import {publicActivity} from './public-activity.mjs';
@@ -64,7 +65,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
     fs.renameSync(lock,lock+'.stale-'+Date.now());
   }
   fs.writeFileSync(lock,String(process.pid),{flag:'wx'});
-  let server, stopped=false, active, watcher;
+  let server, stopped=false, active, watcher, viewerOpened=false;
   const state=JSON.parse(fs.readFileSync(stateFile,'utf8'));
   state.config.provider=validateProvider(provider);
   const generic=customWorkflow(state);
@@ -113,9 +114,11 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
     const stopFile=path.join(root,'stop.request'); if(fs.existsSync(stopFile))fs.unlinkSync(stopFile);
     watcher=setInterval(()=>{if(fs.existsSync(stopFile))stop();},300);
     console.log('Starting native Codex and the bundled provider proxy...');
-    server=await start(root,state.config);
-    atomic(path.join(root,'viewer.json'),{url:server.url,threadId:null,role:state.role});
-    if(visible) openViewer(root);
+    if(!generic||currentRole(state).kind!=='robot'){
+      server=await start(root,state.config);
+      atomic(path.join(root,'viewer.json'),{url:server.url,threadId:null,role:state.role});
+      if(visible){openViewer(root);viewerOpened=true;}
+    }
     while(!stopped && state.runs.length<state.config.maxRuns && state.status!=='COMPLETE') {
       if(state.failures>=state.config.maxFailures) {state.status='NEEDS_ATTENTION';break;}
       if(state.disconnectFailures>state.config.disconnectRetries){state.status='NEEDS_ATTENTION';break;}
@@ -124,7 +127,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
         if(stopped)break;
         state.nextRetryAt=null;save();
       }
-      if(!server)server=await start(root,state.config);
+      if(!server&&(!generic||currentRole(state).kind!=='robot')){server=await start(root,state.config);if(visible&&!viewerOpened){atomic(path.join(root,'viewer.json'),{url:server.url,threadId:null,role:state.role});openViewer(root);viewerOpened=true;}}
       if(JSON.stringify(snapshot(work))!==JSON.stringify(state.expected)) throw Error('Project changed between roles.');
       const spec=generic?currentRole(state):null;
       preservePlannerBaseline(root,state);
@@ -137,9 +140,23 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
       const before=snapshot(work), record={id,role,startedAt:new Date().toISOString(),status:'RUNNING'};
       const restoreProtected=checkpoint(state,work,dir,before);
       state.runs.push(record);state.status=role;state.expected=before;save();
-      console.log(`\n${role} | fresh 16K session | run ${id}`);log(root,'role.started',{id,role});
+      console.log(`\n${role} | ${spec?.kind==='robot'?'script robot':'fresh 16K session'} | run ${id}`);log(root,'role.started',{id,role});
       let cancelCompletion;
       try {
+        if(spec?.kind==='robot'){
+          atomic(path.join(root,'viewer.json'),{url:server?.url||'',threadId:null,role,robot:true});
+          const result=await runRobot(spec,root,abort.signal);
+          fs.writeFileSync(path.join(dir,'robot.log'),result.output);
+          fs.appendFileSync(path.join(root,'activity.jsonl'),JSON.stringify({at:new Date().toISOString(),role,run:id,type:'command',text:'Robot: '+spec.name,output:result.output,exitCode:result.code})+'\n');
+          boundary(role,before,snapshot(work));
+          if(result.code!==0&&!spec.routes.REVISE)throw Error('Robot exited '+result.code+': '+result.output.slice(-2000));
+          const output=result.code===0?'# DONE\nRobot '+spec.name+' completed successfully with exit code zero.\n'+result.output:'# REVISE\n- [ ] Fix the check failure below, verify the correction, and hand off again.\n'+result.output;
+          const resultRoute=workflowOutcome(state,work,output,{passed:true,results:[]});
+          state.expected=snapshot(work);state.handoff=output;state.role=resultRoute.next==='NEEDS_ATTENTION'?role:resultRoute.next;state.status=resultRoute.next==='COMPLETE'?'COMPLETE':resultRoute.next==='NEEDS_ATTENTION'?'NEEDS_ATTENTION':'READY';state.failures=0;state.feedback=resultRoute.next==='NEEDS_ATTENTION'?output:'';record.status='FINISHED';record.outcome=resultRoute.outcome;record.next=resultRoute.next;
+          fs.writeFileSync(path.join(dir,'handoff.md'),output);
+          if(resultRoute.next==='NEEDS_ATTENTION')break;
+          continue;
+        }
         const started=await server.connection.request('thread/start',{cwd:work,model:spec?.model||state.config.model,modelProvider:'nova_remote',approvalPolicy:'never',sandbox:spec?.access||(role==='REVIEWER'?'read-only':'workspace-write'),baseInstructions:generic?'Use the provided Codex tools on Windows PowerShell to fulfill your assigned role and the original request. Respect file boundaries. Use apply_patch for edits and exec_command for bounded commands. Act with tools instead of describing hypothetical work. Verify results proportionately and leave a concise factual handoff.':roleInstructions(role,original),config:{model_context_window:16384,model_auto_compact_token_limit:12000},selectedCapabilityRoots:[]});
         record.threadId=started.thread.id;save();
         // Each role starts a NEW thread. Resume is used only by the display to
@@ -264,7 +281,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
       } catch(error) {
         cancelCompletion?.();
         record.status=stopped?'STOPPED':'FAILED';record.error=error.message;
-        const disconnected=isDisconnect(error);
+        const disconnected=spec?.kind!=='robot'&&isDisconnect(error);
         const stalled=/^Builder stalled:/.test(error.message);
         const deadline=/Role deadline exceeded/.test(error.message);
         // If no terminal turn event arrived, the server might still be editing.
@@ -297,7 +314,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
           state.role=role==='BUILDER'?'REVIEWER':role;
           record.next=state.role;record.status='HANDED_OFF';state.status='READY';
           log(root,'deadline.handoff',{role,next:state.role,attempt:state.deadlineRecoveries});
-         }else if(!stopped && isBusy(error)){
+         }else if(!stopped && spec?.kind!=='robot' && isBusy(error)){
           state.busyRetries++;
           if(state.busyRetries>3){state.status='NEEDS_ATTENTION';state.feedback='NOVA remained busy after three delayed retries. Check for another active model request, then Continue.';break;}
           const delayMs=30000*2**(state.busyRetries-1);
@@ -320,6 +337,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
           console.log(`Connection recovery ${state.disconnectFailures}/${state.config.disconnectRetries}: fresh ${role} in ${delayMs/1000}s; files preserved.`);
           log(root,'connection.retry',{role,run:id,attempt:state.disconnectFailures,delayMs});
         }else {
+          if(spec?.kind==='robot'){state.status='NEEDS_ATTENTION';break;}
           if(!stopped)state.failures++;
           if(/deadline|timed out|startup failed|no product progress|no usable final (?:review|workflow)/i.test(error.message)){state.status='NEEDS_ATTENTION';break;}
         }
@@ -328,7 +346,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
     }
     if(stopped)state.status='STOPPED';
     else if(state.status!=='COMPLETE')state.status='NEEDS_ATTENTION';
-    if(state.runs.length>=state.config.maxRuns)state.feedback='Run budget reached';
+    if(state.status!=='COMPLETE'&&state.runs.length>=state.config.maxRuns)state.feedback='Run budget reached';
     save();return state;
   } catch(error) {state.status='NEEDS_ATTENTION';state.feedback=error.message;save();throw error;}
   finally {

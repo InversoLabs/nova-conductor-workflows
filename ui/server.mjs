@@ -1,3 +1,7 @@
+import {config as newsroomConfig,fetchSources,enrichSources,validateStory} from '../newsroom/scripts/newsroom.mjs';
+import {readSchedules,saveSchedule,writeSchedules,createScheduler} from '../src/schedules.mjs';
+import {atomic,snapshot} from '../src/workflow.mjs';
+import {storedKey,storeKey} from '../src/credentials.mjs';
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,12 +27,17 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
   const redact=value=>{let text=String(value);for(const job of jobs.values())if(job.secret)text=text.split(job.secret).join('[REDACTED]');return text;};
   function summary(root){const s=readJSON(path.join(root,'state.json'));return {id:projectId(root),name:path.basename(root),root,status:s.status,role:s.role,model:s.config.model,provider:s.config.provider,feedback:redact(s.feedback||''),runs:s.runs.length,updated:fs.statSync(path.join(root,'state.json')).mtime.toISOString()};}
   function listProjects(){for(const dir of roots)if(fs.existsSync(dir))for(const entry of fs.readdirSync(dir,{withFileTypes:true}))if(entry.isDirectory()&&!entry.isSymbolicLink()){const root=path.join(dir,entry.name);if(fs.existsSync(path.join(root,'state.json')))projects.set(projectId(root),root);}return [...projects.values()].flatMap(root=>{try{return [summary(root)];}catch{return [];}}).sort((a,b)=>b.updated.localeCompare(a.updated));}
+  function anyRunning(){
+    if([...jobs.values()].some(j=>j.child?.exitCode===null))return true;
+    listProjects();for(const root of projects.values()){try{const pid=Number(fs.readFileSync(path.join(root,'conductor.lock'),'utf8'));if(Number.isInteger(pid)&&pid>0){process.kill(pid,0);return true;}}catch{}}
+    return false;
+  }
   function rootFor(id){listProjects();const root=projects.get(id);if(!root)throw Error('Project not found');return root;}
   function stopped(root){const s=readJSON(path.join(root,'state.json'));if(!['READY','STOPPED','COMPLETE','NEEDS_ATTENTION'].includes(s.status))throw Error('Stop the project before making this change');if(fs.existsSync(path.join(root,'conductor.lock'))){const pid=Number(fs.readFileSync(path.join(root,'conductor.lock')));try{process.kill(pid,0);throw Error('Project still has a running controller');}catch(e){if(e.code!=='ESRCH')throw e;}}return s;}
   function libraries(){const warnings=[];const load=kind=>listLibrary(kind).flatMap(item=>{try{return [{...item,value:kind==='agents'?loadAgent(item.key):loadTemplate(item.key)}];}catch(e){warnings.push(item.name+': '+e.message);return [];}});return {templates:load('templates'),agents:load('agents'),warnings};}
   async function start(root,key){
-    stopped(root);if([...jobs.values()].some(j=>j.child&&j.child.exitCode===null))throw Error('Another UI run is active. Stop it before starting another.');
-    const provider=loadProvider(),secret=key||providerKey(provider);const env={...process.env};if(provider.keyEnv)env[provider.keyEnv]=secret;
+    stopped(root);if(anyRunning())throw Error('Another Conductor run is active. Wait for it to finish or stop it first.');
+    const provider=loadProvider(),robotOnly=readJSON(path.join(root,'state.json')).workflow?.roles.every(r=>r.kind==='robot'),secret=key||await storedKey(provider.keyEnv)||(robotOnly?'':providerKey(provider));const env={...process.env};if(provider.keyEnv)env[provider.keyEnv]=secret;
     const child=(launch||((root,env)=>spawn(process.execPath,[path.join(base,'src/conductor.mjs'),'run',root],{env,windowsHide:true,stdio:['ignore','pipe','pipe']})))(root,env);
     const job={child,secret};jobs.set(projectId(root),job);
     const output=data=>fs.appendFileSync(path.join(root,'ui-controller.log'),redact(data));child.stdout?.on('data',output);child.stderr?.on('data',output);
@@ -42,6 +51,26 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
   }
   async function api(req,url,data){
     const route=url.pathname;
+    if(req.method==='GET'&&route==='/api/newsroom'){const c=newsroomConfig();const r=await fetch(c.siteUrl+'/stories.json?v='+Date.now(),{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('Cannot load public newsroom');return r.json();}
+    if(req.method==='POST'&&route==='/api/newsroom/draft'){
+      const feed=await fetchSources(),urls=(data.story?.sources||[]).map(s=>s.url);feed.sources=feed.sources.filter(s=>urls.includes(s.url));await enrichSources(feed.sources);if(!feed.sources.length||feed.sources.some(s=>s.excerpt.length<500))throw Error('Draft needs a fresh, readable source from the approved newsroom feeds');
+      validateStory(data.story,feed.sources);
+      const saved=listLibrary('templates').find(t=>t.name==='NEWSROOM');if(!saved)throw Error('Install the newsroom workflow first');
+      const template=loadTemplate(saved.key);template.roles=template.roles.filter(r=>r.id!=='COLLECT');template.start='EDITOR';validateTemplate(template);
+      const root=path.join(roots[0],'Submitted-story-'+Date.now());const state=initializeWorkflow(root,'Review the submitted story against its sources. Revise if necessary; publish only when accurate. '+(data.update?'The user requests an update to the existing article with the same source URL.':''),data.model||'gpt-oss:20b',template,undefined,initialize);
+      fs.writeFileSync(path.join(root,'work','SOURCES.json'),JSON.stringify(feed,null,2));fs.writeFileSync(path.join(root,'work','STORY.json'),JSON.stringify(data.story,null,2));state.newsroomUpdate=data.update===true;state.expected=snapshot(path.join(root,'work'));atomic(path.join(root,'state.json'),state);projects.set(projectId(root),root);return summary(root);
+    }
+    if(req.method==='POST'&&route==='/api/newsroom/headline'){
+      if(data.id!=='auto'&&!/^[a-f0-9]{20}$/.test(data.id||''))throw Error('Invalid story');const c=newsroomConfig(),q=s=>"'"+s.replaceAll("'","''")+"'";
+      const script='& '+q(c.remotePython)+' '+q(c.remoteRoot+'/publish.py')+' --headline '+q(data.id);
+      await exec('ssh',['-o','BatchMode=yes','-o','ConnectTimeout=15',c.sshHost,'powershell.exe -NoProfile -EncodedCommand '+Buffer.from(script,'utf16le').toString('base64')],{windowsHide:true,timeout:30000});return {updated:true};
+    }
+    if(req.method==='GET'&&route==='/api/schedules'){const projects=listProjects();return readSchedules().map(s=>({...s,runStatus:projects.find(p=>p.id===s.lastProject)?.status}));}
+    if(req.method==='POST'&&route==='/api/schedules')return saveSchedule(data);
+    if(req.method==='POST'&&route==='/api/schedules/toggle'){const list=readSchedules(),s=list.find(x=>x.id===data.id);if(!s)throw Error('Schedule not found');s.enabled=!!data.enabled;writeSchedules(list);return s;}
+    if(req.method==='POST'&&route==='/api/schedules/remove'){writeSchedules(readSchedules().filter(x=>x.id!==data.id));return {removed:true};}
+    if(req.method==='POST'&&route==='/api/schedules/run'){const s=readSchedules().find(x=>x.id===data.id);if(!s)throw Error('Schedule not found');const project=await launchScheduled(s);writeSchedules(readSchedules().map(x=>x.id===s.id?{...x,lastProject:project,lastManualRunAt:new Date().toISOString(),lastError:''}:x));return {project};}
+    if(req.method==='POST'&&route==='/api/credentials'){return storeKey(loadProvider().keyEnv,data.apiKey);}
     if(req.method==='POST'&&route==='/api/shutdown'){
       if([...jobs.values()].some(j=>j.child&&j.child.exitCode===null))throw Error('Stop the active UI run before closing Conductor.');
       setTimeout(()=>{server.closeAllConnections();server.close();},250);return {closed:true};
@@ -98,7 +127,7 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
       const url=new URL(req.url,origin);
       res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'");
       if(url.pathname==='/favicon.ico'){res.statusCode=204;res.end();return;}
-      if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({app:'nova-conductor-ui',version:'0.5.0-preview.1'}));return;}
+      if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({app:'nova-conductor-ui',version:'0.6.0-preview.1'}));return;}
       if(url.pathname.startsWith('/api/')){
         let data={};if(req.method!=='GET'){if(req.method!=='POST'||req.headers.origin!==origin||!req.headers['content-type']?.startsWith('application/json'))throw Object.assign(Error('A same-origin JSON request is required'),{status:403});let raw='';for await(const part of req){raw+=part;if(raw.length>200000)throw Error('Request too large');}data=JSON.parse(raw||'{}');}
         const result=await api(req,url,data);res.setHeader('Content-Type','application/json');res.end(JSON.stringify(result));return;
@@ -106,6 +135,13 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
       const assets={'/':'index.html','/app.js':'app.js','/style.css':'style.css'};const name=assets[url.pathname];if(!name)throw Object.assign(Error('Not found'),{status:404});res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(path.join(base,'ui',name)));
     }catch(error){res.statusCode=error.status||400;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({error:redact(error.message)}));}
   });
+  const launchScheduled=async s=>{
+    if(anyRunning())throw Error('Another Conductor run is active');
+    const root=path.join(roots[0],s.name.replace(/[^A-Za-z0-9 _-]/g,'').slice(0,50)+'-'+Date.now());
+    initializeWorkflow(root,s.prompt,s.model,s.template,undefined,initialize);projects.set(projectId(root),root);await start(root);return projectId(root);
+  };
+  const scheduler=projectRoots||process.env.NOVA_SCHEDULER_DISABLED==='1'?null:createScheduler({launch:launchScheduled,busy:anyRunning});
+  server.on('close',()=>scheduler?.close());
   server.stopJobs=()=>{for(const [id,job]of jobs)if(job.child?.exitCode===null){const root=projects.get(id);if(root)fs.writeFileSync(path.join(root,'stop.request'),'stop');}};
   return server;
 }

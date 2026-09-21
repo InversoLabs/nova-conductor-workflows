@@ -1,0 +1,110 @@
+{
+  "updatedAt": "2026-09-21T22:46:19.484Z",
+  "stories": [
+    {
+      "id": "08ffdb24bebd9aa2ffda",
+      "title": "OpenAI brings mathematicians into its AI research conversation",
+      "summary": "An independent advisory group will help assess and communicate emerging mathematical results, according to OpenAI.",
+      "category": "Research",
+      "sources": [
+        {
+          "name": "OpenAI",
+          "url": "https://openai.com/index/advisory-group-on-mathematics-and-ai"
+        }
+      ],
+      "paragraphs": [
+        "OpenAI says it is working with an independent mathematics advisory group to help review and communicate results from its AI research. The group is intended to connect the company with the wider mathematical community.",
+        "According to the announcement, members can challenge the company, offer unsolicited advice and make their views public. The development puts attention on how new results are assessed and shared, alongside the capabilities of the systems producing them. This briefing reports the announced arrangement; it does not independently validate mathematical results."
+      ],
+      "publishedAt": "2026-09-21T12:00:00Z",
+      "priority": 100,
+      "format": "BRIEFING",
+      "imageAlt": "Abstract research editorial illustration",
+      "disclosure": "Launch-edition briefing prepared and checked against linked primary sources. AI-assisted reporting; company claims are not independent test results."
+    },
+    {
+      "id": "10538c022345675d1abd",
+      "title": "The next AI race may also be a race to agree on standards",
+      "summary": "OpenAI has proposed international technical coordination around frontier AI, including shared measurements and incident reporting.",
+      "category": "Industry",
+      "sources": [
+        {
+          "name": "OpenAI",
+          "url": "https://openai.com/index/building-standards-next-phase-ai"
+        }
+      ],
+      "paragraphs": [
+        "OpenAI is calling for countries to coordinate technical standards for frontier AI. Its proposal includes common approaches to measuring capabilities, evaluating safeguards and reporting incidents.",
+        "The company describes these as a technical foundation that governments could use within their own legal systems, rather than a single international approval requirement. This is a company policy proposal, not an enacted global framework. The original statement sets out its rationale and the institutions it sees participating."
+      ],
+      "publishedAt": "2026-09-21T12:00:00Z",
+      "priority": 0,
+      "format": "BRIEFING",
+      "imageAlt": "Abstract industry editorial illustration",
+      "disclosure": "Launch-edition briefing prepared and checked against linked primary sources. AI-assisted reporting; company claims are not independent test results."
+    },
+    {
+      "id": "d92122e53ec9d4f7bc6f",
+      "title": "Google adds more economic expertise to its AI research bench",
+      "summary": "The company says it is expanding the team studying how artificial intelligence affects the economy.",
+      "category": "Research",
+      "sources": [
+        {
+          "name": "Google AI",
+          "url": "https://blog.google/innovation-and-ai/technology/ai/expanding-ai-economy-research-bench/"
+        }
+      ],
+      "paragraphs": [
+        "Google has announced additions to its AI and Economy research effort, bringing in academic advisers, fellows and internal researchers. The expansion focuses attention on economic questions surrounding the spread of AI.",
+        "The announcement is evidence of a research-team expansion, not proof of a particular economic outcome. Readers looking for the membership and research priorities can consult the original company post linked below."
+      ],
+      "publishedAt": "2026-09-18T12:00:00Z",
+      "priority": 0,
+      "format": "BRIEFING",
+      "imageAlt": "Abstract research editorial illustration",
+      "disclosure": "Launch-edition briefing prepared and checked against linked primary sources. AI-assisted reporting; company claims are not independent test results."
+    },
+    {
+      "id": "44ec3a3d6fdc7de7b05f",
+      "title": "AI tools move behind the scenes at Fashion Week",
+      "summary": "Google describes working with designers on custom Flow tools for preparing their New York Fashion Week presentations.",
+      "category": "Industry",
+      "sources": [
+        {
+          "name": "Google AI",
+          "url": "https://blog.google/innovation-and-ai/technology/ai/google-flow-fashion-week/"
+        }
+      ],
+      "paragraphs": [
+        "Google says it worked with designers Jane Wade and Sergio Hudson on custom Flow tools during preparations for New York Fashion Week. The collaboration places generative tools inside a specific creative production process.",
+        "This is a company account of the collaboration. It should not be read as an independent assessment of creative quality or a general claim that AI replaces designers. The source provides the details of how the participating teams used the tools."
+      ],
+      "publishedAt": "2026-09-18T12:00:00Z",
+      "priority": 0,
+      "format": "BRIEFING",
+      "imageAlt": "Abstract industry editorial illustration",
+      "disclosure": "Launch-edition briefing prepared and checked against linked primary sources. AI-assisted reporting; company claims are not independent test results."
+    },
+    {
+      "id": "590df77dc8c3726e2134",
+      "title": "Google and the UN system open a new window into global data",
+      "summary": "A new data platform is intended to make international information easier to find and explore.",
+      "category": "Industry",
+      "sources": [
+        {
+          "name": "Google AI",
+          "url": "https://blog.google/innovation-and-ai/technology/ai/google-un-data-commons-platform/"
+        }
+      ],
+      "paragraphs": [
+        "Google and the United Nations system have announced a global data platform built around making information easier to explore. The project connects the practical challenge of accessing public data with new ways of asking questions about it.",
+        "The announcement describes the platform and its intended use. This newsroom has not independently audited its datasets or answers. Readers should consult the original post and underlying sources when using the information for decisions."
+      ],
+      "publishedAt": "2026-09-17T12:00:00Z",
+      "priority": 0,
+      "format": "BRIEFING",
+      "imageAlt": "Abstract industry editorial illustration",
+      "disclosure": "Launch-edition briefing prepared and checked against linked primary sources. AI-assisted reporting; company claims are not independent test results."
+    }
+  ]
+}

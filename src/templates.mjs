@@ -1,3 +1,4 @@
+import {validateRobot} from './robots.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -55,6 +56,8 @@ export function validateTemplate(value){
   for(const r of t.roles){
     if(typeof r.id!=='string'||!idPattern.test(r.id)||ids.has(r.id)||terminals.includes(r.id))throw Error('Duplicate or invalid role ID: '+r.id);
     ids.add(r.id);text(r.name,'role name',100);text(r.prompt,'role prompt');
+    if(r.kind!==undefined&&!['agent','robot'].includes(r.kind))throw Error('Invalid role kind');
+    if(r.kind==='robot'){validateRobot(r.robot);if(!r.routes?.DONE)throw Error('Robot needs a DONE route');}
     if(!['read-only','workspace-write'].includes(r.access))throw Error('Invalid access for '+r.id);
     if(r.model&&!modelPattern.test(r.model))throw Error('Invalid model for '+r.id);
     for(const field of ['inputs','outputs','writes']){

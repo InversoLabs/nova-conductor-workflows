@@ -1,6 +1,8 @@
 # Nova Conductor Workflows
 
-**v0.5.0-preview.1 — Conductor Studio visual UI.** Based on [Nova Conductor v0.3.4](https://github.com/InversoLabs/nova-conductor/releases/tag/v0.3.4). Includes reusable sequential workflows and one-shot agents with the native Codex terminal.
+**v0.6.0-preview.1 — script robots, schedules, and the IN / SIGNAL newsroom.** Based on [Nova Conductor v0.3.4](https://github.com/InversoLabs/nova-conductor/releases/tag/v0.3.4). Includes reusable sequential workflows and one-shot agents with the native Codex terminal.
+
+New: script robot nodes run configured programs between AI roles. Schedules launch fresh projects at daily times. The [newsroom case study](newsroom/README.md) collects sources, writes, reviews, illustrates and publishes via SSH.
 
 Double-click **Start Conductor UI.cmd** for the pixel office, visual workflow canvas, agent library, project controls, and global provider settings. See [STUDIO.md](STUDIO.md). The existing CLI remains available.
 

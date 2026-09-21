@@ -1,6 +1,6 @@
 {
   "name": "nova-conductor-workflows",
-  "version": "0.5.0-preview.1",
+  "version": "0.6.0-preview.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -15,7 +15,8 @@
     "README.md",
     "examples",
     "ui",
-    "STUDIO.md"
+    "STUDIO.md",
+    "newsroom"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
