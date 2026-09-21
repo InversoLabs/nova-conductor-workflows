@@ -9,7 +9,8 @@ function Read-Paths([string]$Label,$Default) {
     return @($text.Split(',') | ForEach-Object {$_.Trim()} | Where-Object {$_})
 }
 function Select-Library([string]$Kind) {
-    $items=@(& node $cli $Kind | ConvertFrom-Json)
+    $parsed=& node $cli $Kind | ConvertFrom-Json
+    $items=@($parsed)
     if($LASTEXITCODE -ne 0){throw 'Cannot read library.'}
     for($i=0;$i -lt $items.Count;$i++){Write-Host ("{0}  {1}" -f ($i+1),$items[$i].name)}
     Write-Host 'P  Load a JSON definition from disk'
