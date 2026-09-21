@@ -15,7 +15,7 @@ test('native Codex executes a Gemma bare-text patch through the owned proxy',{
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'conductor-native-'));
  const packageRoot=fileURLToPath(new URL('../',import.meta.url)),copy=path.join(root,'package');
  fs.mkdirSync(copy);fs.copyFileSync(path.join(packageRoot,'package.json'),path.join(copy,'package.json'));
- for(const dir of ['src','infrastructure'])fs.cpSync(path.join(packageRoot,dir),path.join(copy,dir),{recursive:true});
+ for(const dir of ['src','infrastructure','examples'])fs.cpSync(path.join(packageRoot,dir),path.join(copy,dir),{recursive:true});
  const launcher=path.join(copy,'infrastructure','nova-codex-interactive.ps1');
  fs.writeFileSync(launcher,fs.readFileSync(launcher,'utf8').replace('Local\\NOVA.Codex.Remote.Session',`Local\\Conductor.Native.Test.${process.pid}`).replace("Join-Path $env:LOCALAPPDATA 'NOVA-Codex'",`'${root.replaceAll("'","''")}/codex-home'`));
  const {startServer}=await import(pathToFileURL(path.join(copy,'src/runtime.mjs')));

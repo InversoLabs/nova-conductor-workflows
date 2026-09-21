@@ -12,7 +12,8 @@
     "test",
     "*.ps1",
     "*.cmd",
-    "README.md"
+    "README.md",
+    "examples"
   ],
   "scripts": {
     "test": "node --test test/*.test.mjs"

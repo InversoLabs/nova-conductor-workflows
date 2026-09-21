@@ -73,7 +73,7 @@ while($true){
     Write-Host 'Each role opens a fresh 16K session in the native Codex window.'
     $provider=(& node $cli provider | ConvertFrom-Json)
     Write-Host "New-project provider: $($provider.kind) at $($provider.baseUrl)"
-    Write-Host "1 New project  |  2 Continue  |  3 Status  |  4 Stop  |  5 Projects  |  6 Model ($model)  |  7 Reopen  |  8 Provider settings  |  9 Change project provider  |  I Import existing codebase  |  W Workflow  |  O One-shot agent  |  T Templates  |  A Agents  |  Q Quit"
+    Write-Host "1 New project  |  2 Continue  |  3 Status  |  4 Stop  |  5 Projects  |  6 Model ($model)  |  7 Reopen  |  8 Provider settings  |  9 Change project provider  |  I Import existing codebase  |  W Workflow  |  O One-shot agent  |  B Nova Builder 20B  |  T Templates  |  A Agents  |  Q Quit"
     try {
         switch((Read-Host 'Choose').ToUpperInvariant()){
             '1' {
@@ -152,6 +152,7 @@ while($true){
             }
             'W' {Start-Workflow}
             'O' {Start-Workflow -OneShot}
+            'B' {Start-Workflow -OneShot -AgentKey 'nova-builder-20b'}
             'T' {$null=Edit-Template}
             'A' {$null=Edit-Agent}
             'Q' {exit}

@@ -28,6 +28,7 @@ builtins['code-final-review'].name='Code builder with second final review';
 builtins['code-final-review'].roles[2].routes.APPROVE='FINAL_REVIEWER';
 builtins['code-final-review'].roles.push({...structuredClone(builtins['custom-code'].roles[2]),id:'FINAL_REVIEWER',name:'Final reviewer',prompt:'Perform an independent final review of the actual product against the original request and build plan. Do not accept the prior review as proof. Verify required behavior and the rendered result when relevant and possible. Approve only with concrete evidence; otherwise give a concrete revision checklist. Report unverified requirements rather than assuming success.'});
 export const defaultAgent={schemaVersion:1,id:'GENERAL',name:'General agent',prompt:'Inspect the existing project and its instructions. Use tools to complete the user request, preserving unrelated work. Verify the actual result with proportionate checks. Report changes, evidence, and any remaining blocker.',access:'workspace-write'};
+const builderAgent=JSON.parse(fs.readFileSync(new URL('../examples/nova-builder-20b.json',import.meta.url),'utf8'));
 function text(value,label,max=12000){if(typeof value!=='string'||!value.trim()||value.length>max)throw Error('Invalid '+label);}
 function artifact(value){
   if(typeof value!=='string'||value.length>200||value.includes('\\')||value.split('/').some(p=>!p||p==='.'||p==='..'||/[<>:"|?*\x00-\x1f]/.test(p)||/[. ]$/.test(p)||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p))||value.split('/').some(p=>['.git','.conductor'].includes(p.toLowerCase()))||value.toUpperCase()==='REQUEST.MD')throw Error('Unsafe artifact path: '+value);
@@ -83,10 +84,10 @@ export function validateTemplate(value){
 }
 export function listLibrary(kind){
   const folder=path.join(libraryRoot(),kind);const saved=fs.existsSync(folder)?fs.readdirSync(folder).filter(f=>f.endsWith('.json')).map(f=>({key:path.join(folder,f),name:path.basename(f,'.json')})):[];
-  return kind==='agents'?[{key:'general',name:defaultAgent.name},...saved]:[...Object.entries(builtins).map(([key,t])=>({key,name:t.name})),...saved];
+  return kind==='agents'?[{key:'general',name:defaultAgent.name},{key:'nova-builder-20b',name:builderAgent.name},...saved.filter(x=>path.basename(x.key)!=='NOVA_BUILDER_20B.json')]:[...Object.entries(builtins).map(([key,t])=>({key,name:t.name})),...saved];
 }
 export function loadTemplate(key){return validateTemplate(builtins[key]||JSON.parse(fs.readFileSync(key,'utf8')));}
-export function loadAgent(key){return validateAgent(key==='general'?defaultAgent:JSON.parse(fs.readFileSync(key,'utf8')));}
+export function loadAgent(key){return validateAgent(key==='general'?defaultAgent:key==='nova-builder-20b'?builderAgent:JSON.parse(fs.readFileSync(key,'utf8')));}
 export function saveLibrary(kind,value){
   value=kind==='agents'?validateAgent(value):validateTemplate(value);
   if(kind==='templates'&&value.engine)throw Error('Built-in coding template cannot be overwritten');

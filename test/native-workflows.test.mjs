@@ -8,7 +8,7 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 
 test('native workflow runner executes writing roles and one-shot through bundled proxy', {skip:process.env.CONDUCTOR_NATIVE_TEST!=='1',timeout:120000},async t=>{
  const parent=fs.mkdtempSync(path.join(os.tmpdir(),'nova-native-workflows-'));const copy=path.join(parent,'package');fs.mkdirSync(copy);
- const base=fileURLToPath(new URL('../',import.meta.url));fs.copyFileSync(path.join(base,'package.json'),path.join(copy,'package.json'));for(const d of ['src','infrastructure'])fs.cpSync(path.join(base,d),path.join(copy,d),{recursive:true});
+ const base=fileURLToPath(new URL('../',import.meta.url));fs.copyFileSync(path.join(base,'package.json'),path.join(copy,'package.json'));for(const d of ['src','infrastructure','examples'])fs.cpSync(path.join(base,d),path.join(copy,d),{recursive:true});
  const launcher=path.join(copy,'infrastructure','nova-codex-interactive.ps1');fs.writeFileSync(launcher,fs.readFileSync(launcher,'utf8').replace('Local\\NOVA.Codex.Remote.Session',`Local\\Conductor.Workflow.Test.${process.pid}`).replace("Join-Path $env:LOCALAPPDATA 'NOVA-Codex'",`'${parent.replaceAll("'","''")}/codex-home'`));
  const {initialize,run}=await import(pathToFileURL(path.join(copy,'src/conductor.mjs')));
  const {initializeWorkflow,builtins,oneShot,defaultAgent}=await import(pathToFileURL(path.join(copy,'src/templates.mjs')));

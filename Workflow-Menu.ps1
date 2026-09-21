@@ -79,9 +79,9 @@ function Edit-Template {
     Write-Host ($template | ConvertTo-Json -Depth 20)
     return Save-Definition 'templates' $template
 }
-function Start-Workflow([switch]$OneShot) {
+function Start-Workflow([switch]$OneShot,[string]$AgentKey) {
     if($OneShot){
-        if((Read-Host 'S Select saved agent | N Create agent').ToUpperInvariant() -eq 'N'){$key=Edit-Agent}else{$key=Select-Library 'agents'}
+        if($AgentKey){$key=$AgentKey}elseif((Read-Host 'S Select saved agent | N Create agent').ToUpperInvariant() -eq 'N'){$key=Edit-Agent}else{$key=Select-Library 'agents'}
     }else{$key=Select-Library 'templates'}
     $name=Read-Host 'Project name'
     if($name -notmatch '^[A-Za-z0-9][A-Za-z0-9 _-]{0,59}$'){throw 'Use letters, numbers, spaces or dashes.'}
