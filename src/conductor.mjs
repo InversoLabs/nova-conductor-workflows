@@ -1,5 +1,6 @@
 import {checkpoint,customWorkflow,currentRole,workflowPrompt,assertWorkflowChanges,workflowOutcome,initializeWorkflow,validateTemplate,loadTemplate,loadAgent,oneShot,listLibrary,saveLibrary} from './templates.mjs';
 import {importProject} from './import-project.mjs';
+import {publicActivity} from './public-activity.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { preservePlannerBaseline, atomic, snapshot, assertRoleChanges, nextPhase, rolePrompt, roleInstructions, readText, saveReview, reviewDecision, normalizeReview } from './workflow.mjs';
@@ -166,6 +167,8 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
             try {
             const p=event.params;
             if(p?.threadId!==record.threadId)return;
+            const activity=publicActivity(event);
+            if(activity)fs.appendFileSync(path.join(root,'activity.jsonl'),JSON.stringify({...activity,role,run:id})+'\n');
             progress?.notice(event);
             if(['item/started','item/completed'].includes(event.method) && ['commandExecution','fileChange'].includes(p.item?.type))log(root,'tool.activity',{run:id,event:event.method,type:p.item.type,status:p.item.status});
             if((generic||role==='REVIEWER') && event.method==='item/completed' && p.item?.type==='agentMessage' && p.item.phase!=='commentary') reviewOutput=p.item.text || reviewOutput;
