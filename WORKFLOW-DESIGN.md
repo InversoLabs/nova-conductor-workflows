@@ -1,6 +1,6 @@
 # Reusable workflows — development direction
 
-Status: design baseline. Custom workflow execution is not implemented yet. The inherited code-building workflow still runs unchanged.
+Status: implemented in v0.4.0-preview.1. Reusable workflows, agent profiles, one-shot execution, generic routing, and the guided CLI editor are available. The original coding engine remains a compatibility preset. See WORKFLOWS.md for usage and verification scope. The milestones below describe the implementation sequence; live-model quality testing remains a user trial.
 
 ## Product
 
@@ -35,7 +35,9 @@ The runtime records the template version, current role, entry reason, outcomes, 
 
 The user request is immutable. Requirements/briefs are written by their designated planning role; implementers write deliverables and progress notes; reviewers return evidence and repair instructions. The engine saves review artifacts. Templates must not give competing ownership to these documents.
 
-Protect originals before starting a role and check writes before advancing. An unauthorized edit must never silently redefine acceptance criteria. Recovery must preserve useful deliverable work and the attempted edit for diagnosis while retaining the trusted requirements. This needs explicit implementation and tests; the inherited runtime currently stops on protected-file violations.
+Protect originals before starting a role and check writes before advancing. Protected-file restoration is implemented: the controller archives attempted edits, restores trusted originals, preserves allowed deliverable work, and stops for guidance with a consistent snapshot. Reopen can then resume the project.
+
+One-shot mode selects or creates one reusable agent and runs it on an empty project or imported codebase. DONE completes the run; BLOCKED stops for attention. It adds no planner or reviewer. Disconnect recovery stays on the same role with fresh context. A second final review in a custom workflow is another read-only role on the approval route.
 
 ## Small implementation milestones
 

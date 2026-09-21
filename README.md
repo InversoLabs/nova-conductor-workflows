@@ -1,8 +1,8 @@
 # Nova Conductor Workflows
 
-Experimental development fork of [Nova Conductor](https://github.com/InversoLabs/nova-conductor), starting from v0.3.4. Custom templates are not implemented yet; the inherited coding workflow remains functional. See [WORKFLOW-DESIGN.md](WORKFLOW-DESIGN.md) for the design and staged implementation plan.
+**v0.4.0-preview.1 — ready for workflow testing.** Based on [Nova Conductor v0.3.4](https://github.com/InversoLabs/nova-conductor/releases/tag/v0.3.4). Includes reusable sequential workflows and one-shot agents with the native Codex terminal.
 
-For the current coding release, use the parent repository.
+Choose **W** to run a workflow, **O** for a one-shot agent, **T** to create/edit/duplicate workflow templates, and **A** to manage agent profiles. **2 / 4 / 7** continue, stop, or reopen at any role. Configure your provider with **8**. See [WORKFLOWS.md](WORKFLOWS.md) for setup, examples, and verification scope. Imported projects use separate working copies. The original coding preset remains available; the parent release is the rollback baseline.
 
 Give Conductor a prompt. A planner writes the project instructions and build
 plan, a builder implements it, and a reviewer checks the result. When it needs
@@ -23,7 +23,7 @@ reasoning summaries the selected model/provider exposes.
    ```
 2. Start your model server and load a model that supports tool calling.
 3. Download this repository using **Code → Download ZIP**, then extract it.
-   Alternatively: `git clone https://github.com/InversoLabs/nova-conductor.git`.
+   Alternatively: `git clone https://github.com/InversoLabs/nova-conductor-workflows.git`.
 4. Double-click **Start Conductor.cmd**. No `npm install` is needed in this folder.
 5. Choose **8 — Provider settings**, select your server, and enter its API URL.
 6. Choose **1 — New project**, enter a name and prompt, and select a model from

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "CODE",
+  "name": "Code project builder",
+  "engine": "coding-v1",
+  "start": "PLANNER",
+  "maxRuns": 60,
+  "roles": [
+    {
+      "id": "PLANNER",
+      "name": "Planner"
+    },
+    {
+      "id": "BUILDER",
+      "name": "Builder"
+    },
+    {
+      "id": "REVIEWER",
+      "name": "Reviewer"
+    }
+  ]
+}

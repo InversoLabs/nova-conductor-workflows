@@ -36,7 +36,7 @@ test('native Codex executes a Gemma bare-text patch through the owned proxy',{
  });
  await new Promise(r=>upstream.listen(0,'127.0.0.1',r));
  let server;
- t.after(()=>{server?.connection.close();killTree(server?.child);server?.closeProxy();upstream.closeAllConnections();upstream.close();});
+ t.after(()=>{server?.connection.close();killTree(server?.child);server?.closeProxy();upstream.closeAllConnections();upstream.close();const exe=path.join(root,'codex-home','.sandbox-bin','codex.exe');if(fs.existsSync(exe))fs.unlinkSync(exe);});
  // Leave trial files in TEMP for diagnosis; never touch a user project.
  server=await startServer(root,{port:18799,model:'gemma4:e2b-it-qat',provider:{kind:'ollama',baseUrl:`http://127.0.0.1:${upstream.address().port}/v1`,keyEnv:''}});
  const {thread}=await server.connection.request('thread/start',{cwd:path.join(root,'work'),model:'gemma4:e2b-it-qat',modelProvider:'nova_remote',approvalPolicy:'never',sandbox:'workspace-write',selectedCapabilityRoots:[]});

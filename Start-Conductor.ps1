@@ -2,8 +2,9 @@ param([switch]$CheckOnly)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Model-Selector.ps1')
 $cli=Join-Path $PSScriptRoot 'src/conductor.mjs'
-$projects=Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Nova Conductor Projects'
+$projects=Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Nova Conductor Workflow Projects'
 $model='gpt-oss:20b'
+. (Join-Path $PSScriptRoot 'Workflow-Menu.ps1')
 function Read-Project {
     $candidates=@()
     if(Test-Path -LiteralPath $projects){$candidates+=@(Get-ChildItem -LiteralPath $projects -Directory | ForEach-Object {$_.FullName})}
@@ -67,12 +68,12 @@ function Set-Provider {
 foreach($name in @('node','git','codex')){if(-not(Get-Command $name -ErrorAction SilentlyContinue)){throw "$name is required on PATH. See README.md for setup."}}
 if($CheckOnly){Write-Host 'Nova Conductor launcher ready.';exit 0}
 while($true){
-    Write-Host "`nNOVA CONDUCTOR" -ForegroundColor Cyan
-    Write-Host 'Prompt > Planner > Builder > Reviewer > checklist > Builder'
+    Write-Host "`nNOVA CONDUCTOR WORKFLOWS - preview" -ForegroundColor Cyan
+    Write-Host 'Saved workflows, custom roles, and one-shot agents'
     Write-Host 'Each role opens a fresh 16K session in the native Codex window.'
     $provider=(& node $cli provider | ConvertFrom-Json)
     Write-Host "New-project provider: $($provider.kind) at $($provider.baseUrl)"
-    Write-Host "1 New project  |  2 Continue  |  3 Status  |  4 Stop  |  5 Projects  |  6 Model ($model)  |  7 Reopen  |  8 Provider settings  |  9 Change project provider  |  I Import existing codebase  |  Q Quit"
+    Write-Host "1 New project  |  2 Continue  |  3 Status  |  4 Stop  |  5 Projects  |  6 Model ($model)  |  7 Reopen  |  8 Provider settings  |  9 Change project provider  |  I Import existing codebase  |  W Workflow  |  O One-shot agent  |  T Templates  |  A Agents  |  Q Quit"
     try {
         switch((Read-Host 'Choose').ToUpperInvariant()){
             '1' {
@@ -111,9 +112,13 @@ while($true){
             '7' {
                 $selected=Read-Project
                 if($selected){
-                    Write-Host 'Restart from: 1 Planner | 2 Builder | 3 Reviewer'
-                    $phase=Read-Host 'Choose phase'
-                    $role=switch($phase){'1'{'PLANNER'} '2'{'BUILDER'} '3'{'REVIEWER'} default{throw 'Choose 1, 2, or 3.'}}
+                    $projectState=Get-Content -LiteralPath (Join-Path $selected 'state.json') -Raw | ConvertFrom-Json
+                    $roleIds=@('PLANNER','BUILDER','REVIEWER')
+                    if($projectState.workflow){$roleIds=@($projectState.workflow.roles | ForEach-Object {$_.id})}
+                    for($i=0;$i -lt $roleIds.Count;$i++){Write-Host ("{0}  {1}" -f ($i+1),$roleIds[$i])}
+                    $phase=0
+                    if(-not [int]::TryParse((Read-Host 'Restart from role number'),[ref]$phase) -or $phase -lt 1 -or $phase -gt $roleIds.Count){throw 'Choose a listed role.'}
+                    $role=$roleIds[$phase-1]
                     $feedback=Read-Host 'Guidance for this phase (Enter to continue existing work)'
                     if(-not $feedback.Trim()){$feedback='Continue from the existing project files and current requirements.'}
                     if(-not $feedback.Trim()){throw 'Feedback is required.'}
@@ -145,6 +150,10 @@ while($true){
                 Write-Host "Working copy: $root\work" -ForegroundColor Green
                 Start-Project $root
             }
+            'W' {Start-Workflow}
+            'O' {Start-Workflow -OneShot}
+            'T' {$null=Edit-Template}
+            'A' {$null=Edit-Agent}
             'Q' {exit}
         }
     }catch{Write-Host $_.Exception.Message -ForegroundColor Red}

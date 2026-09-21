@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "id": "CODE_FINAL_REVIEW",
+  "name": "Code builder with second final review",
+  "start": "PLANNER",
+  "maxRuns": 40,
+  "roles": [
+    {
+      "id": "PLANNER",
+      "name": "Planner",
+      "prompt": "Read the request and relevant existing files. Write only AGENTS.md with project constraints and file conventions, and BUILD_PLAN.md with concrete requested requirements, ordered implementation steps, and proportionate acceptance checks. Do not invent requirements or agent teams. Do not build yet. Read back both files before handoff.",
+      "access": "workspace-write",
+      "inputs": [],
+      "outputs": [
+        "AGENTS.md",
+        "BUILD_PLAN.md"
+      ],
+      "writes": [
+        "AGENTS.md",
+        "BUILD_PLAN.md"
+      ],
+      "routes": {
+        "DONE": "BUILDER",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    },
+    {
+      "id": "BUILDER",
+      "name": "Builder",
+      "prompt": "Read the project instructions and build plan. Implement the requested product using tools. If the latest handoff requests revisions, fix that concrete checklist while preserving working behavior. Keep planning documents unchanged. Verify the result proportionately and report evidence and limitations.",
+      "access": "workspace-write",
+      "inputs": [
+        "AGENTS.md",
+        "BUILD_PLAN.md"
+      ],
+      "outputs": [],
+      "writes": [
+        "*"
+      ],
+      "routes": {
+        "DONE": "REVIEWER",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    },
+    {
+      "id": "REVIEWER",
+      "name": "Reviewer",
+      "prompt": "Inspect the actual product read-only against every original requirement and build-plan acceptance check. Independently verify behavior with available tools, including the rendered result for visual work when possible. Approve only when required work is verified. Otherwise request revisions with an ordered concrete checklist and verification steps. Do not treat optional improvements as requirements.",
+      "access": "read-only",
+      "inputs": [
+        "AGENTS.md",
+        "BUILD_PLAN.md"
+      ],
+      "outputs": [],
+      "writes": [],
+      "routes": {
+        "APPROVE": "FINAL_REVIEWER",
+        "REVISE": "BUILDER",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    },
+    {
+      "id": "FINAL_REVIEWER",
+      "name": "Final reviewer",
+      "prompt": "Perform an independent final review of the actual product against the original request and build plan. Do not accept the prior review as proof. Verify required behavior and the rendered result when relevant and possible. Approve only with concrete evidence; otherwise give a concrete revision checklist. Report unverified requirements rather than assuming success.",
+      "access": "read-only",
+      "inputs": [
+        "AGENTS.md",
+        "BUILD_PLAN.md"
+      ],
+      "outputs": [],
+      "writes": [],
+      "routes": {
+        "APPROVE": "COMPLETE",
+        "REVISE": "BUILDER",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    }
+  ]
+}

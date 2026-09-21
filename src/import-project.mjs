@@ -9,7 +9,7 @@ function futurePath(value) {
   const parent=path.dirname(value);
   return path.join(futurePath(parent),path.basename(value));
 }
-export function importProject(root,source,prompt,model,initialize) {
+export function importProject(root,source,prompt,model,initialize,{generic=false}={}) {
   source=fs.realpathSync(source);root=futurePath(path.resolve(root));
   if(!fs.statSync(source).isDirectory())throw Error('Source must be a codebase folder');
   if(fs.existsSync(root))throw Error('New project folder must not exist');
@@ -33,15 +33,17 @@ export function importProject(root,source,prompt,model,initialize) {
     for(const file of files) {
       // Preserve pre-existing workflow documents outside the worker's scope;
       // imported AGENTS.md remains active and is never rewritten here.
-      const target=path.join(root,reserved.has(file)?'imported-documents':'work',file);
+      const target=path.join(root,(generic?file.toLowerCase()==='request.md':[...reserved].some(x=>x.toLowerCase()===file.toLowerCase()))?'imported-documents':'work',file);
       fs.mkdirSync(path.dirname(target),{recursive:true});
       fs.copyFileSync(path.join(source,file),target,fs.constants.COPYFILE_EXCL);
     }
+    if(!generic){
     if(!fs.existsSync(path.join(work,'AGENTS.md')))fs.writeFileSync(path.join(work,'AGENTS.md'),'# Existing project\nPreserve existing architecture, conventions, and working behavior. Follow REQUEST.md. Record changes and checks in BUILD_NOTES.md. Keep REQUEST.md, AGENTS.md, BUILD_PLAN.md, and REVIEW.md unchanged.\n');
     fs.writeFileSync(path.join(work,'BUILD_PLAN.md'),'# Existing-codebase changes\n\n## Requested work\n'+prompt+'\n\n## Steps\n1. Inspect the existing implementation and relevant project instructions.\n2. Implement the requested changes while preserving unrelated behavior.\n3. Run suitable existing checks and verify the changed behavior.\n\n## Acceptance\nThe request is fulfilled, existing behavior is preserved, and actual verification results and limitations are recorded in BUILD_NOTES.md.\n');
     fs.writeFileSync(path.join(work,'BUILD_CHECKLIST.md'),'# User guidance\n\n'+prompt+'\n\n## Checklist\n- [ ] Inspect the existing codebase, implement the requested changes, and verify the result.\n');
     state.role='BUILDER';state.builderMode='user';state.importedFrom=source;
     state.feedback='User reopened this project at BUILDER. Work on the imported codebase according to the original request; preserve existing functionality.';
+    }
     state.expected=snapshot(work);atomic(path.join(root,'state.json'),state);
     return state;
   } catch(error) {

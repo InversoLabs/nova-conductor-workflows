@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "GENERAL",
+  "name": "General agent",
+  "prompt": "Inspect the existing project and its instructions. Use tools to complete the user request, preserving unrelated work. Verify the actual result with proportionate checks. Report changes, evidence, and any remaining blocker.",
+  "access": "workspace-write"
+}

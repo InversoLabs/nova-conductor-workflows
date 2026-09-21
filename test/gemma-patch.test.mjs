@@ -21,7 +21,7 @@ const events=text=>[
 const decode=raw=>raw.split('\n').filter(l=>l.startsWith('data:')).map(l=>JSON.parse(l.slice(5)));
 test('recorded Gemma output becomes one native patch with both files, content unchanged',()=>{
  const raw=fs.readFileSync(new URL('fixtures/gemma-e2b-bare-patch.txt',import.meta.url),'utf8');
- const expected=raw.replace('*** End Patch\n*** Add File:','*** Add File:');
+ const expected=raw.replaceAll('\r\n','\n').replace('*** End Patch\n*** Add File:','*** Add File:');
  assert.equal(parsePatch(raw),expected);
  const result=promote(response(raw),request);
  assert.equal(result.item.input,expected);assert.equal(result.item.type,'custom_tool_call');

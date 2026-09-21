@@ -14,6 +14,15 @@ export function killTree(child) {
   if (!child?.pid || child.exitCode != null) return;
   try { execFileSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' }); } catch {}
 }
+export async function shutdownServer(server){
+  if(!server)return;
+  killTree(server.child);server.connection?.close();server.closeProxy?.();
+  if(!server.child?.pid||!server.url?.startsWith('ws://'))return;
+  const net=await import('node:net'),url=new URL(server.url);
+  const listening=()=>new Promise(resolve=>{const socket=net.connect(Number(url.port),'127.0.0.1');socket.setTimeout(250);socket.once('connect',()=>{socket.destroy();resolve(true);});socket.once('error',()=>{socket.destroy();resolve(false);});socket.once('timeout',()=>{socket.destroy();resolve(false);});});
+  for(let i=0;i<20;i++){if(!await listening())return;await sleep(250);}
+  throw Error('Owned Codex server has not released its port; wait before starting another run.');
+}
 export function cleanEnvironment(keyEnv) {
   const env = { ...process.env, TERM: 'xterm-256color' };
   for (const key of Object.keys(env)) if (key.startsWith('CODEX_')) delete env[key];
@@ -43,7 +52,13 @@ export async function startServer(root, config) {
   const redact = data => [key,clientToken].filter(Boolean).reduce((out,secret)=>out.split(secret).join('[REDACTED]'),String(data));
   for (const stream of [child.stdout, child.stderr]) stream.on('data', data => fs.appendFileSync(path.join(root, 'server.log'), redact(data)));
   child.stdin.on('error',()=>{});
-  child.stdin.end(JSON.stringify({ command: 'powershell.exe', cwd: path.join(root,'work'), args: ['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(base,'infrastructure/nova-codex-interactive.ps1'),'-Model',config.model,'-Workspace',path.join(root,'work'),'-BaseUrl',proxyBase,'-DirectProvider','-ContextTokens','16384','-AppServerPort',String(port)] }));
+  const catalogArgs=[];
+  if(config.catalogModels?.length){
+    const catalog=JSON.parse(fs.readFileSync(path.join(base,'infrastructure/nova-codex-models.json'),'utf8'));
+    const profile=catalog.models[0];catalog.models=config.catalogModels.map(model=>({...profile,slug:model,display_name:model+' via Conductor',context_window:16384,max_context_window:16384}));
+    const catalogFile=path.join(root,'model-catalog.json');fs.writeFileSync(catalogFile,JSON.stringify(catalog));catalogArgs.push('-ModelCatalog',catalogFile);
+  }
+  child.stdin.end(JSON.stringify({ command: 'powershell.exe', cwd: path.join(root,'work'), args: ['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(base,'infrastructure/nova-codex-interactive.ps1'),'-Model',config.model,'-Workspace',path.join(root,'work'),'-BaseUrl',proxyBase,'-DirectProvider','-ContextTokens','16384','-AppServerPort',String(port),...catalogArgs] }));
   const closeProxy=()=>{proxy.closeAllConnections();proxy.close();};
   child.once('error',closeProxy);child.once('close',closeProxy);
   try {

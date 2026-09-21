@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "WRITING",
+  "name": "Writing studio",
+  "start": "PRODUCER",
+  "maxRuns": 20,
+  "roles": [
+    {
+      "id": "PRODUCER",
+      "name": "Producer",
+      "prompt": "Create BRIEF.md with the requested audience, deliverable, constraints, and concrete acceptance criteria. Keep scope faithful to the request; do not write the final deliverable.",
+      "access": "workspace-write",
+      "inputs": [],
+      "outputs": [
+        "BRIEF.md"
+      ],
+      "writes": [
+        "BRIEF.md"
+      ],
+      "routes": {
+        "DONE": "WRITER",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    },
+    {
+      "id": "WRITER",
+      "name": "Writer",
+      "prompt": "Write or revise the requested deliverable in DRAFT.md using the brief and latest editorial checklist. Preserve the brief. Complete the requested content and check it before handoff.",
+      "access": "workspace-write",
+      "inputs": [
+        "BRIEF.md"
+      ],
+      "outputs": [
+        "DRAFT.md"
+      ],
+      "writes": [
+        "DRAFT.md"
+      ],
+      "routes": {
+        "DONE": "EDITOR",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    },
+    {
+      "id": "EDITOR",
+      "name": "Editor",
+      "prompt": "Read the brief and actual draft. Verify every original requirement. Approve only with concrete evidence. Otherwise return an ordered checklist of specific repairs and how to verify each. Do not add optional requirements.",
+      "access": "read-only",
+      "inputs": [
+        "BRIEF.md",
+        "DRAFT.md"
+      ],
+      "outputs": [],
+      "writes": [],
+      "routes": {
+        "APPROVE": "COMPLETE",
+        "REVISE": "WRITER",
+        "BLOCKED": "NEEDS_ATTENTION"
+      }
+    }
+  ]
+}

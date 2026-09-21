@@ -1,8 +1,9 @@
+import {checkpoint,customWorkflow,currentRole,workflowPrompt,assertWorkflowChanges,workflowOutcome,initializeWorkflow,validateTemplate,loadTemplate,loadAgent,oneShot,listLibrary,saveLibrary} from './templates.mjs';
 import {importProject} from './import-project.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { atomic, snapshot, assertRoleChanges, nextPhase, rolePrompt, roleInstructions, readText, saveReview, reviewDecision, normalizeReview } from './workflow.mjs';
-import { startServer, killTree, sleep, openViewer, runChecks } from './runtime.mjs';
+import { startServer, shutdownServer, killTree, sleep, openViewer, runChecks } from './runtime.mjs';
 import { fileURLToPath } from 'node:url';
 import {loadProvider,saveProvider,listModels} from './providers.mjs';
 import {BuilderProgress,productSignature,interruptBeforeRecovery} from './progress.mjs';
@@ -22,7 +23,7 @@ export function initialize(root,prompt,model='gpt-oss:20b',verification=[]) {
 function log(root,type,data={}) { fs.appendFileSync(path.join(root,'events.jsonl'),JSON.stringify({at:new Date().toISOString(),type,...data})+'\n'); }
 export function reopen(root,feedback,role='BUILDER') {
   role=role.toUpperCase();
-  if(!['PLANNER','BUILDER','REVIEWER'].includes(role))throw Error('Choose PLANNER, BUILDER, or REVIEWER');
+
   root=fs.realpathSync(root);
   if(!feedback?.trim() || feedback.length>12000)throw Error('Provide feedback of 1–12000 characters');
   const lock=path.join(root,'conductor.lock');
@@ -31,12 +32,14 @@ export function reopen(root,feedback,role='BUILDER') {
     fs.writeFileSync(lock,String(process.pid),{flag:'wx'});held=true;
     const stateFile=path.join(root,'state.json'),work=path.join(root,'work');
     const state=JSON.parse(fs.readFileSync(stateFile,'utf8'));
+    if(!(state.workflow?.roles.map(r=>r.id)||['PLANNER','BUILDER','REVIEWER']).includes(role))throw Error('Choose a role in this project workflow');
     if(!['COMPLETE','STOPPED','NEEDS_ATTENTION','READY'].includes(state.status))throw Error('Stop the active run before reopening');
     if(JSON.stringify(snapshot(work))!==JSON.stringify(state.expected))throw Error('Project changed outside Conductor; inspect before reopening');
     if(readText(work,'REQUEST.md')!==state.prompt)throw Error('Original request changed');
     const archive=path.join(root,'reopened-'+Date.now());fs.mkdirSync(archive);
     for(const file of ['state.json','work/REVIEW.md','work/BUILD_CHECKLIST.md'])if(fs.existsSync(path.join(root,file)))fs.copyFileSync(path.join(root,file),path.join(archive,path.basename(file)));
-    fs.writeFileSync(path.join(work,'BUILD_CHECKLIST.md'),'# User feedback\n\n'+feedback.trim()+'\n\n# Build Checklist\n\n- [ ] Address the user feedback above using the existing project, verify the changes, and hand off for review.\n');
+    if(!customWorkflow(state))fs.writeFileSync(path.join(work,'BUILD_CHECKLIST.md'),'# User feedback\n\n'+feedback.trim()+'\n\n# Build Checklist\n\n- [ ] Address the user feedback above using the existing project, verify the changes, and hand off for review.\n');
+    if(customWorkflow(state)){state.guidance=feedback.trim();state.handoff='';}
     state.role=role;state.status='STOPPED';state.failures=0;state.disconnectFailures=0;state.busyRetries=0;state.deadlineRecoveries=0;state.stalledBuilds=0;state.nextRetryAt=null;state.lastBuildSignature=null;
     state.progressRecoveries=0;
     if(role==='BUILDER')state.builderMode='user'; else if(role==='PLANNER')delete state.builderMode;
@@ -62,6 +65,9 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
   fs.writeFileSync(lock,String(process.pid),{flag:'wx'});
   let server, stopped=false, active, watcher;
   const state=JSON.parse(fs.readFileSync(stateFile,'utf8'));
+  const generic=customWorkflow(state);
+  if(generic)state.config.catalogModels=[...new Set([state.config.model,...state.workflow.roles.map(r=>r.model).filter(Boolean)])];
+  const boundary=(role,before,after)=>generic?assertWorkflowChanges(state,before,after):assertRoleChanges(role,before,after);
   // Migrate the former default only; retain explicitly customized deadlines.
   if(state.config.roleTimeoutMs===10*60*1000){
     state.config.roleTimeoutMs=30*60*1000;
@@ -79,6 +85,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
   const stop=()=>{stopped=true; abort.abort(); if(active) server?.connection.request('turn/interrupt',active).catch(()=>{});};
   process.on('SIGINT',stop);process.on('SIGTERM',stop);
   try {
+    if(state.workflow){validateTemplate(state.workflow);if(JSON.stringify(JSON.parse(fs.readFileSync(path.join(root,'workflow.json'),'utf8')))!==JSON.stringify(state.workflow))throw Error('Saved workflow snapshot changed');}
     if(state.status==='COMPLETE') { console.log('Project already complete.'); return state; }
     if(!Array.isArray(state.config.verification)||!state.config.verification.every(c=>Array.isArray(c)&&c.length&&c.every(a=>typeof a==='string'&&a.length)))throw Error('Verification must be an array of command argv arrays');
     if(state.config.contextTokens!==16384)throw Error('Conductor requires 16K sessions');
@@ -87,7 +94,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
     if(readText(work,'REQUEST.md')!==state.prompt) throw Error('Original request changed.');
     // Upgrade an already-stopped builder from the old immediate-deadline failure.
     // File integrity was checked above; consume the same bounded recovery budget.
-    if(state.status==='NEEDS_ATTENTION' && state.role==='BUILDER' && /^Role deadline exceeded/.test(state.feedback) && state.deadlineRecoveries<3) {
+    if(!generic && state.status==='NEEDS_ATTENTION' && state.role==='BUILDER' && /^Role deadline exceeded/.test(state.feedback) && state.deadlineRecoveries<3) {
       const checks=await check(root,state.config.verification,abort.signal);
       if(JSON.stringify(snapshot(work))!==JSON.stringify(state.expected))throw Error('Verification modified project files');
       fs.writeFileSync(path.join(root,'recovery-checks.json'),JSON.stringify(checks,null,2));
@@ -117,26 +124,28 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
       }
       if(!server)server=await start(root,state.config);
       if(JSON.stringify(snapshot(work))!==JSON.stringify(state.expected)) throw Error('Project changed between roles.');
+      const spec=generic?currentRole(state):null;
       const role=state.role, id=String(state.runs.length+1).padStart(4,'0'), dir=path.join(root,'runs',id);
       fs.mkdirSync(dir);
-      if(role==='REVIEWER' && fs.existsSync(path.join(work,'REVIEW.md'))) {
+      if(!generic && role==='REVIEWER' && fs.existsSync(path.join(work,'REVIEW.md'))) {
         fs.copyFileSync(path.join(work,'REVIEW.md'),path.join(dir,'previous-review.md'));
         fs.unlinkSync(path.join(work,'REVIEW.md'));
       }
       const before=snapshot(work), record={id,role,startedAt:new Date().toISOString(),status:'RUNNING'};
+      const restoreProtected=checkpoint(state,work,dir,before);
       state.runs.push(record);state.status=role;state.expected=before;save();
       console.log(`\n${role} | fresh 16K session | run ${id}`);log(root,'role.started',{id,role});
+      let cancelCompletion;
       try {
-        const started=await server.connection.request('thread/start',{cwd:work,model:state.config.model,modelProvider:'nova_remote',approvalPolicy:'never',sandbox:role==='REVIEWER'?'read-only':'workspace-write',baseInstructions:roleInstructions(role,original),config:{model_context_window:16384,model_auto_compact_token_limit:12000},selectedCapabilityRoots:[]});
+        const started=await server.connection.request('thread/start',{cwd:work,model:spec?.model||state.config.model,modelProvider:'nova_remote',approvalPolicy:'never',sandbox:spec?.access||(role==='REVIEWER'?'read-only':'workspace-write'),baseInstructions:generic?'Use the provided Codex tools on Windows PowerShell to fulfill your assigned role and the original request. Respect file boundaries. Use apply_patch for edits and exec_command for bounded commands. Act with tools instead of describing hypothetical work. Verify results proportionately and leave a concise factual handoff.':roleInstructions(role,original),config:{model_context_window:16384,model_auto_compact_token_limit:12000},selectedCapabilityRoots:[]});
         record.threadId=started.thread.id;save();
         // Each role starts a NEW thread. Resume is used only by the display to
         // attach to that just-created thread, never to carry old role context.
-        const prompt=rolePrompt(state);fs.writeFileSync(path.join(dir,'prompt.md'),prompt);
-        let cancelCompletion;
+        const prompt=generic?workflowPrompt(state):rolePrompt(state);fs.writeFileSync(path.join(dir,'prompt.md'),prompt);
         let reviewOutput='';
         let reviewClarifications=0;
         const completion=new Promise((resolve,reject)=>{
-          const progress=role==='BUILDER'?new BuilderProgress(before,state.config):null;
+          const progress=!generic&&role==='BUILDER'?new BuilderProgress(before,state.config):null;
           const progressTimer=progress?setInterval(()=>{
             try{
               const reason=progress.check(snapshot(work));
@@ -147,16 +156,17 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
             }catch(error){cleanup();reject(error);}
           },state.config.progressPollMs??15000):null;
           const deadline=()=>{ if(active)server.connection.request('turn/interrupt',active).catch(()=>{}); cleanup();reject(Error('Role deadline exceeded; partial files preserved'));};
-          const timeoutMs=role==='BUILDER' ? (state.config.builderTimeoutMs ?? state.config.roleTimeoutMs) : state.config.roleTimeoutMs;
+          const timeoutMs=(spec?.access==='workspace-write'||role==='BUILDER') ? (state.config.builderTimeoutMs ?? state.config.roleTimeoutMs) : state.config.roleTimeoutMs;
           let timer=setTimeout(deadline,timeoutMs);
           const cancelled=()=>{cleanup();reject(Error('Stopped; partial work preserved'));};
           const disconnect=()=>{cleanup();reject(Error('Codex disconnected'));};
           const notice=event=>{
+            try {
             const p=event.params;
             if(p?.threadId!==record.threadId)return;
             progress?.notice(event);
             if(['item/started','item/completed'].includes(event.method) && ['commandExecution','fileChange'].includes(p.item?.type))log(root,'tool.activity',{run:id,event:event.method,type:p.item.type,status:p.item.status});
-            if(role==='REVIEWER' && event.method==='item/completed' && p.item?.type==='agentMessage' && p.item.phase!=='commentary') reviewOutput=p.item.text || reviewOutput;
+            if((generic||role==='REVIEWER') && event.method==='item/completed' && p.item?.type==='agentMessage' && p.item.phase!=='commentary') reviewOutput=p.item.text || reviewOutput;
             if(event.method==='turn/started') {
               active={threadId:record.threadId,turnId:p.turn.id};record.turnEnded=false;
               if(state.status==='PAUSED') {
@@ -171,7 +181,17 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
               log(root,'role.paused',{id,role});return;
             }
             if(event.method==='turn/completed') {
-              if(role==='REVIEWER' && p.turn.status==='completed') {
+              if(generic && p.turn.status==='completed') {
+                reviewOutput=(p.turn.items||[]).filter(i=>i.type==='agentMessage'&&i.phase!=='commentary').at(-1)?.text||reviewOutput;
+                const outcome=reviewOutput.trim().split(/\r?\n/)[0].replace(/^#+\s*/,'').trim();
+                const usable=Object.hasOwn(spec.routes,outcome)&&reviewOutput.trim().split(/\s+/).length>=8&&(outcome!=='REVISE'||/^- \[ \] .+/m.test(reviewOutput));
+                if(!usable && reviewClarifications++===0 && !stopped){
+                  fs.writeFileSync(path.join(dir,'incomplete-handoff.md'),reviewOutput);reviewOutput='';active=null;
+                  server.connection.request('turn/start',{threadId:record.threadId,input:[{type:'text',text:'Provide your final handoff based on work already performed. Start with one of '+Object.keys(spec.routes).map(o=>'# '+o).join(', ')+', followed by concrete results and verification evidence. REVISE needs - [ ] corrective steps. Use BLOCKED if unfinished. Do not repeat work just to format the handoff.',text_elements:[]}],effort:'minimal'}).then(r=>{active={threadId:record.threadId,turnId:r.turn.id};}).catch(e=>{cleanup();reject(e);});return;
+                }
+                if(!usable){cleanup();reject(Error('No usable final workflow handoff after clarification'));return;}
+              }
+              if(!generic && role==='REVIEWER' && p.turn.status==='completed') {
                 reviewOutput=(p.turn.items||[]).filter(i=>i.type==='agentMessage' && i.phase!=='commentary').at(-1)?.text || reviewOutput;
                 fs.writeFileSync(path.join(dir,'review-response-'+reviewClarifications+'.md'),reviewOutput,'utf8');
                 reviewOutput=normalizeReview(reviewOutput);
@@ -187,6 +207,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
               }
               cleanup();resolve(p.turn);
             }
+            }catch(error){cleanup();reject(error);}
           };
           const cleanup=()=>{clearTimeout(timer);clearInterval(progressTimer);abort.signal.removeEventListener('abort',cancelled);server.connection.off('notice',notice);server.connection.off('disconnected',disconnect);};
           cancelCompletion=()=>{cleanup();reject(Error('Turn startup failed'));};
@@ -202,21 +223,26 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
         const turn=await completion;active=null;record.turnEnded=true;
         if(stopped || turn.status==='interrupted') throw Error('Stopped; partial work preserved');
         if(turn.status!=='completed') throw Error(turn.error?.message || `Codex turn ${turn.status}`);
-        let after=snapshot(work);assertRoleChanges(role,before,after);
-        if(role==='REVIEWER') {
+        let after=snapshot(work);boundary(role,before,after);
+        if(!generic && role==='REVIEWER') {
           if(!reviewOutput)reviewOutput=(turn.items||[]).filter(i=>i.type==='agentMessage' && i.phase!=='commentary').at(-1)?.text || '';
           if(reviewOutput){saveReview(work,reviewOutput);after=snapshot(work);}
         }
         if(readText(work,'REQUEST.md')!==state.prompt)throw Error('Original request changed');
         state.expected=after;
         let checks;
-        if(role!=='PLANNER') {
+        if(generic || role!=='PLANNER') {
           console.log('Running independent project checks...');checks=await check(root,state.config.verification,abort.signal);
           fs.writeFileSync(path.join(dir,'checks.json'),JSON.stringify(checks,null,2));
           if(JSON.stringify(snapshot(work))!==JSON.stringify(after))throw Error('Verification modified project files');
         }
-        const next=nextPhase(role,work,checks);
-        if(role==='BUILDER') {
+        let next;
+        if(generic){
+          const output=(turn.items||[]).filter(i=>i.type==='agentMessage'&&i.phase!=='commentary').at(-1)?.text||reviewOutput;
+          fs.writeFileSync(path.join(dir,'handoff.md'),output);
+          const result=workflowOutcome(state,work,output,checks);next=result.next;record.outcome=result.outcome;state.handoff=output;
+        }else next=nextPhase(role,work,checks);
+        if(!generic && role==='BUILDER') {
           if(productSignature(before)!==productSignature(after))state.progressRecoveries=0;
           const product=Object.fromEntries(Object.entries(after).filter(([name])=>!['BUILD_NOTES.md','BUILD_CHECKLIST.md','REVIEW.md'].includes(name)));
           const signature=JSON.stringify(product);
@@ -226,10 +252,12 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
         }
         if(stopped)throw Error('Stopped after verification; partial work preserved');
         state.feedback=checks && !checks.passed ? 'Configured tests failed. Fix them before completion.\n'+checks.results.filter(r=>!r.passed).map(r=>r.output).join('\n').slice(-3000) : '';
-        if(next==='BUILDER')state.builderMode=role==='REVIEWER'?'repair':'implementation';
-        state.role=next;state.status=next==='COMPLETE'?'COMPLETE':'READY';state.failures=0;state.disconnectFailures=0;state.nextRetryAt=null;state.busyRetries=0;
+        if(!generic && next==='BUILDER')state.builderMode=role==='REVIEWER'?'repair':'implementation';
+        state.role=next==='NEEDS_ATTENTION'?role:next;state.status=next==='COMPLETE'?'COMPLETE':next==='NEEDS_ATTENTION'?'NEEDS_ATTENTION':'READY';state.failures=0;state.disconnectFailures=0;state.nextRetryAt=null;state.busyRetries=0;
         record.status='FINISHED';record.next=next;
+        if(next==='NEEDS_ATTENTION'){state.feedback=state.feedback||state.handoff;break;}
       } catch(error) {
+        cancelCompletion?.();
         record.status=stopped?'STOPPED':'FAILED';record.error=error.message;
         const disconnected=isDisconnect(error);
         const stalled=/^Builder stalled:/.test(error.message);
@@ -246,7 +274,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
           server?.connection.close();server?.closeProxy?.();server=null;active=null;
         }
         const after=snapshot(work);
-        try {assertRoleChanges(role,before,after);state.expected=after;}catch(unsafe){state.status='NEEDS_ATTENTION';state.feedback=unsafe.message;break;}
+        try {boundary(role,before,after);state.expected=after;}catch(unsafe){restoreProtected(after);state.expected=snapshot(work);state.status='NEEDS_ATTENTION';state.feedback=unsafe.message+'. Protected originals restored; attempted edits saved in runs/'+id+'/rejected-edits. Reopen with guidance to continue.';break;}
         state.feedback=error.message;
         console.log(error.message);
         if(!stopped && stalled){
@@ -255,7 +283,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
           state.feedback='The previous builder stalled without useful progress. Read the existing files once, then use apply_patch to implement the smallest unfinished build-plan or checklist step immediately. Do not redesign or restate the plan. Preserve working files. Verify this small change and hand off with remaining work.';
           state.status='READY';record.next='BUILDER';
           log(root,'builder.progress-retry',{id,attempt:state.progressRecoveries});
-        }else if(!stopped && deadline && role!=='REVIEWER' && state.deadlineRecoveries<3){
+        }else if(!generic && !stopped && deadline && role!=='REVIEWER' && state.deadlineRecoveries<3){
           state.deadlineRecoveries++;
           const checks=role==='PLANNER'?null:await check(root,state.config.verification,abort.signal);
           if(JSON.stringify(snapshot(work))!==JSON.stringify(after))throw Error('Verification modified project files');
@@ -274,7 +302,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
           console.log('NOVA busy: retry '+state.busyRetries+'/3 in '+delayMs/1000+' seconds.');
           log(root,'model.busy',{role,attempt:state.busyRetries,delayMs});
         }else if(!stopped && disconnected){
-          if(role==='BUILDER'){
+          if(!generic && role==='BUILDER'){
             state.progressRecoveries=productSignature(before)===productSignature(after)?state.progressRecoveries+1:0;
             if(state.progressRecoveries>1){state.status='NEEDS_ATTENTION';state.feedback='Builder repeatedly disconnected without product changes. Files preserved; inspect the provider/model before continuing.';break;}
           }
@@ -283,12 +311,12 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
           const delayMs=Math.min(60000,state.config.retryDelayMs*2**(state.disconnectFailures-1));
           state.nextRetryAt=new Date(Date.now()+delayMs).toISOString();
           state.feedback=`The previous ${role} session lost its connection. Partial files are preserved. Inspect existing work and continue without repeating completed edits. ${error.message}`;
-          if(role==='BUILDER' && state.progressRecoveries)state.feedback+=' Implement the smallest unfinished plan/checklist step with apply_patch now, verify that small change, then hand off. Do not restate or redesign the plan.';
+          if(!generic && role==='BUILDER' && state.progressRecoveries)state.feedback+=' Implement the smallest unfinished plan/checklist step with apply_patch now, verify that small change, then hand off. Do not restate or redesign the plan.';
           console.log(`Connection recovery ${state.disconnectFailures}/${state.config.disconnectRetries}: fresh ${role} in ${delayMs/1000}s; files preserved.`);
           log(root,'connection.retry',{role,run:id,attempt:state.disconnectFailures,delayMs});
         }else {
           if(!stopped)state.failures++;
-          if(/deadline|timed out|startup failed|no product progress|no usable final review/i.test(error.message)){state.status='NEEDS_ATTENTION';break;}
+          if(/deadline|timed out|startup failed|no product progress|no usable final (?:review|workflow)/i.test(error.message)){state.status='NEEDS_ATTENTION';break;}
         }
       } finally {record.endedAt=new Date().toISOString();save();log(root,'role.finished',record);}
       if(visible)await sleep(2000);
@@ -300,10 +328,11 @@ export async function run(root,{visible=true,start=startServer,check=runChecks}=
   } catch(error) {state.status='NEEDS_ATTENTION';state.feedback=error.message;save();throw error;}
   finally {
     clearInterval(watcher);process.off('SIGINT',stop);process.off('SIGTERM',stop);
-    atomic(path.join(root,'viewer.json'),{done:true,status:state.status});
-    if(active)await server?.connection.request('turn/interrupt',active).catch(()=>{});
-    server?.connection.close();killTree(server?.child);server?.closeProxy?.();
-    fs.unlinkSync(lock);
+    // Cleanup must run even if the disk is full and state/viewer writes fail.
+    try{atomic(path.join(root,'viewer.json'),{done:true,status:state.status});}catch(error){console.error('Could not save viewer status: '+error.message);}
+    try{
+      if(active && server)await Promise.race([server.connection.request('turn/interrupt',active).catch(()=>{}),sleep(2000)]);
+    }finally{try{await shutdownServer(server);}finally{if(fs.existsSync(lock))fs.unlinkSync(lock);}}
   }
 }
 if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
@@ -319,6 +348,14 @@ if(process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.
         if(args[0] && !/^[a-zA-Z0-9][\w.:/-]{0,199}$/.test(args[0]))throw Error('Invalid model name');
         s.config.provider=loadProvider();if(args[0])s.config.model=args[0];atomic(file,s);console.log('Project provider updated; model: '+s.config.model);
       }finally{if(held)fs.unlinkSync(lock);}
+    }
+    else if(command==='templates'||command==='agents'){console.log(JSON.stringify(listLibrary(command)));}
+    else if(command==='save-template'||command==='save-agent'){console.log(saveLibrary(command==='save-agent'?'agents':'templates',JSON.parse(fs.readFileSync(root,'utf8'))));}
+    else if(command==='show-template'){console.log(JSON.stringify(loadTemplate(root),null,2));}
+    else if(command==='show-agent'){console.log(JSON.stringify(loadAgent(root),null,2));}
+    else if(command==='workflow-init'||command==='one-shot'){
+      const template=command==='one-shot'?oneShot(loadAgent(args[0])):loadTemplate(args[0]);
+      const s=initializeWorkflow(root,fs.readFileSync(args[1],'utf8'),args[2],template,args[3],initialize);console.log('Ready at '+s.role+': '+path.join(path.resolve(root),'work'));
     }
     else if(command==='init') {initialize(root,fs.readFileSync(args[0],'utf8'),args[1]);console.log(path.resolve(root));}
     else if(command==='import') {importProject(root,args[0],fs.readFileSync(args[1],'utf8'),args[2],initialize);console.log('Imported into '+path.resolve(root)+'; ready at BUILDER. Original folder unchanged.');}
