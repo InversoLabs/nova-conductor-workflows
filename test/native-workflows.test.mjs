@@ -32,7 +32,7 @@ test('native workflow runner executes writing roles and one-shot through bundled
  for(const kind of ['writing','one-shot']){
   const root=path.join(parent,kind);const template=kind==='writing'?structuredClone(builtins.writing):oneShot(defaultAgent);if(kind==='writing')template.roles[2].model='editor-native-test';
   const s=initializeWorkflow(root,'Write a short robot story.','workflow-native-test',template,null,initialize);s.config.port=18819;s.config.provider={kind:'ollama',baseUrl:`http://127.0.0.1:${upstream.address().port}/v1`,keyEnv:''};fs.writeFileSync(path.join(root,'state.json'),JSON.stringify(s));
-  const done=await run(root,{visible:false});assert.equal(done.status,'COMPLETE',done.feedback);assert.equal(done.runs.length,kind==='writing'?3:1);assert.ok(fs.existsSync(path.join(root,'work',kind==='writing'?'DRAFT.md':'proof.txt')));assert.equal(fs.existsSync(path.join(root,'conductor.lock')),false);
+  const done=await run(root,{visible:false,provider:s.config.provider});assert.equal(done.status,'COMPLETE',done.feedback);assert.equal(done.runs.length,kind==='writing'?3:1);assert.ok(fs.existsSync(path.join(root,'work',kind==='writing'?'DRAFT.md':'proof.txt')));assert.equal(fs.existsSync(path.join(root,'conductor.lock')),false);
  }
  assert.ok(seen.some(x=>x.role==='EDITOR'&&x.model==='editor-native-test'));assert.equal(calls,7);
  console.log('Native workflow trial artifacts: '+parent);

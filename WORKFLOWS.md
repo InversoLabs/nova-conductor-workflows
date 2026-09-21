@@ -76,3 +76,5 @@ node --test --test-concurrency=1 test/native-provider.test.mjs test/native-gemma
 ```
 
 The original desktop install and parent v0.3.4 release remain the rollback baseline.
+
+Provider selection is global. Menu 8 (or 9) is the only menu that changes it. All projects use that setting on their next run; provider snapshots in old projects are refreshed rather than reused. Reselecting NOVA keeps its remembered server URL and key-variable name. Existing active workers keep their current connection until stopped.
