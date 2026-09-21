@@ -1,6 +1,6 @@
 # Nova Conductor Workflows
 
-**v0.4.0-preview.1 — ready for workflow testing.** Based on [Nova Conductor v0.3.4](https://github.com/InversoLabs/nova-conductor/releases/tag/v0.3.4). Includes reusable sequential workflows and one-shot agents with the native Codex terminal.
+**v0.4.0-preview.2 — ready for workflow testing.** Based on [Nova Conductor v0.3.4](https://github.com/InversoLabs/nova-conductor/releases/tag/v0.3.4). Includes reusable sequential workflows and one-shot agents with the native Codex terminal.
 
 Choose **W** to run a workflow, **O** for a one-shot agent, **T** to create/edit/duplicate workflow templates, and **A** to manage agent profiles. **2 / 4 / 7** continue, stop, or reopen at any role. Configure your provider with **8**. See [WORKFLOWS.md](WORKFLOWS.md) for setup, examples, and verification scope. Imported projects use separate working copies. The original coding preset remains available; the parent release is the rollback baseline.
 
@@ -178,3 +178,5 @@ It checks a real file edit and tool-result round trip without NOVA Desktop,
 SSH, credentials, or model inference. This is not a model-quality benchmark
 or a claim of live Ollama/LM Studio validation. Temporary smoke files remain in
 TEMP for diagnosis. Test a small project with your actual provider/model first.
+
+Builders may update BUILD_PLAN.md without stopping the run. Conductor saves the original plan in planner-baseline.md outside the work folder; reviewers use it alongside REQUEST.md to retain the original acceptance requirements.

@@ -73,6 +73,7 @@ function Edit-Template {
         }else{$routes.DONE=(Read-Default 'Done destination (role ID or COMPLETE)' $(if($old.routes.DONE){$old.routes.DONE}else{$defaultNext})).ToUpperInvariant()}
         $role.routes=$routes
     }
+    if($base.allowBuildPlanUpdates){$template.allowBuildPlanUpdates=$true}
     $template.roles=$roles;$template.start=(Read-Default 'Starting role ID' $(if($base){$base.start}else{$roles[0].id})).ToUpperInvariant()
     Write-Host ($template | ConvertTo-Json -Depth 20)
     return Save-Definition 'templates' $template

@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "id": "CODE_FINAL_REVIEW",
   "name": "Code builder with second final review",
+  "allowBuildPlanUpdates": true,
   "start": "PLANNER",
   "maxRuns": 40,
   "roles": [
@@ -27,7 +28,7 @@
     {
       "id": "BUILDER",
       "name": "Builder",
-      "prompt": "Read the project instructions and build plan. Implement the requested product using tools. If the latest handoff requests revisions, fix that concrete checklist while preserving working behavior. Keep planning documents unchanged. Verify the result proportionately and report evidence and limitations.",
+      "prompt": "Read the project instructions and build plan. Implement the requested product using tools. If the latest handoff requests revisions, fix that concrete checklist while preserving working behavior. You may update BUILD_PLAN.md to reflect implementation, even if existing notes call it read-only; retain original requirements. Keep AGENTS.md unchanged. Verify the result proportionately and report evidence and limitations.",
       "access": "workspace-write",
       "inputs": [
         "AGENTS.md",

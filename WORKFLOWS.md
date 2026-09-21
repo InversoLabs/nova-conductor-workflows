@@ -23,7 +23,7 @@ Choose **T**, then New or Edit/duplicate. Change the ID to create a duplicate. T
 3. Destinations: DONE for workers; APPROVE and REVISE for reviewers. All roles can report BLOCKED.
 4. Starting role.
 
-Paths are exact relative file paths. `*` under writable paths allows general product edits except REQUEST.md and artifacts owned by other roles. It is not a glob language. Each owned artifact has one owner. Read-only roles own no writable output files; the controller saves their final Markdown response.
+Paths are exact relative file paths. `*` under writable paths allows general product edits except REQUEST.md and artifacts owned by other roles. It is not a glob language. Each owned artifact has one owner, except the coding presets explicitly permit builder updates to BUILD_PLAN.md while retaining the original planner baseline. Read-only roles own no writable output files; the controller saves their final Markdown response.
 
 For a second final review, add a read-only role, route the first review's APPROVE to it, and set APPROVE -> COMPLETE and REVISE -> your builder/writer. Invalid destinations, duplicate IDs, unreachable roles, unsafe paths, competing ownership, and unbounded budgets are rejected before saving. Every role must have a route to completion.
 
