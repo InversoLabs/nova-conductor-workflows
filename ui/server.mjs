@@ -1,3 +1,4 @@
+import {invokePublisher} from '../newsroom/scripts/newsroom.mjs';
 import {config as newsroomConfig,fetchSources,enrichSources,validateStory} from '../newsroom/scripts/newsroom.mjs';
 import {readSchedules,saveSchedule,writeSchedules,createScheduler} from '../src/schedules.mjs';
 import {atomic,snapshot} from '../src/workflow.mjs';
@@ -38,7 +39,7 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
   async function start(root,key){
     stopped(root);if(anyRunning())throw Error('Another Conductor run is active. Wait for it to finish or stop it first.');
     const provider=loadProvider(),robotOnly=readJSON(path.join(root,'state.json')).workflow?.roles.every(r=>r.kind==='robot'),secret=key||await storedKey(provider.keyEnv)||(robotOnly?'':providerKey(provider));const env={...process.env};if(provider.keyEnv)env[provider.keyEnv]=secret;
-    const child=(launch||((root,env)=>spawn(process.execPath,[path.join(base,'src/conductor.mjs'),'run',root],{env,windowsHide:true,stdio:['ignore','pipe','pipe']})))(root,env);
+    const child=(launch||((root,env)=>spawn(process.execPath,[path.join(base,'src/conductor.mjs'),'run',root,...(process.env.NOVA_CONDUCTOR_HEADLESS==='1'?['--headless']:[])],{env,windowsHide:true,stdio:['ignore','pipe','pipe']})))(root,env);
     const job={child,secret};jobs.set(projectId(root),job);
     const output=data=>fs.appendFileSync(path.join(root,'ui-controller.log'),redact(data));child.stdout?.on('data',output);child.stderr?.on('data',output);
     child.once('error',error=>{output(error.message);job.secret='';});child.once('close',()=>{job.secret='';});return {started:true};
@@ -62,8 +63,7 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
     }
     if(req.method==='POST'&&route==='/api/newsroom/headline'){
       if(data.id!=='auto'&&!/^[a-f0-9]{20}$/.test(data.id||''))throw Error('Invalid story');const c=newsroomConfig(),q=s=>"'"+s.replaceAll("'","''")+"'";
-      const script='& '+q(c.remotePython)+' '+q(c.remoteRoot+'/publish.py')+' --headline '+q(data.id);
-      await exec('ssh',['-o','BatchMode=yes','-o','ConnectTimeout=15',c.sshHost,'powershell.exe -NoProfile -EncodedCommand '+Buffer.from(script,'utf16le').toString('base64')],{windowsHide:true,timeout:30000});return {updated:true};
+      invokePublisher(c,['--headline',data.id]);return {updated:true};
     }
     if(req.method==='GET'&&route==='/api/schedules'){const projects=listProjects();return readSchedules().map(s=>({...s,runStatus:projects.find(p=>p.id===s.lastProject)?.status}));}
     if(req.method==='POST'&&route==='/api/schedules')return saveSchedule(data);

@@ -186,3 +186,5 @@ TEMP for diagnosis. Test a small project with your actual provider/model first.
 Builders may update BUILD_PLAN.md without stopping the run. Conductor saves the original plan in planner-baseline.md outside the work folder; reviewers use it alongside REQUEST.md to retain the original acceptance requirements.
 
 Provider selection is global: new and resumed projects use the provider selected in menu 8 (menu 9 is an alias). Existing project snapshots never switch the global provider. Provider settings remember each provider's last endpoint and key-variable name; pressing Enter preserves them. A running session keeps its provider until stopped.
+
+Server deployment and operations: [SERVER.md](SERVER.md). The tested NOVA-SERVER setup runs independently of the laptop, with its server user signed in.
