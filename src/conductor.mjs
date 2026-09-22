@@ -1,3 +1,4 @@
+import {recoverReadOnlyReview} from './review-recovery.mjs';
 import {runRobot} from './robots.mjs';
 import {checkpoint,customWorkflow,currentRole,workflowPrompt,assertWorkflowChanges,workflowOutcome,initializeWorkflow,validateTemplate,loadTemplate,loadAgent,oneShot,listLibrary,saveLibrary} from './templates.mjs';
 import {importProject} from './import-project.mjs';
@@ -263,6 +264,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
           const output=(turn.items||[]).filter(i=>i.type==='agentMessage'&&i.phase!=='commentary').at(-1)?.text||reviewOutput;
           fs.writeFileSync(path.join(dir,'handoff.md'),output);
           const result=workflowOutcome(state,work,output,checks);next=result.next;record.outcome=result.outcome;state.handoff=output;
+          if(recoverReadOnlyReview(state,spec,result,output)){next=role;record.recovery="read-only-review";log(root,"review.role-retry",{role,run:id});}
         }else next=nextPhase(role,work,checks);
         if(!generic && role==='BUILDER') {
           if(productSignature(before)!==productSignature(after))state.progressRecoveries=0;
