@@ -147,3 +147,7 @@ See [server operations](SERVER.md), [anchor setup and recovery](newsroom/anchor/
 and [Instagram setup and recovery](newsroom/social/README.md). Run `npm test`,
 `python website/test_video.py`, and `python newsroom/scripts/test_publish.py`
 after relevant changes. Live model/Instagram acceptance is separate from unit tests.
+
+## Hardware storefront — September 22
+
+Live at https://inversolabs.us/newsroom/hardware/. One navigation link beside Open source; no homepage product sections or article recommendations, per the updated user scope. Eight verified Seeed listings include DGX Spark (explicitly marked discontinued/out of stock at verification) and Jetson AGX Thor. Catalog/config and maintenance/deployment instructions: newsroom/HARDWARE.md. Static files deployed to website public and server Conductor source without service restarts. Desktop/mobile rendering, search/category filtering and tracking URLs verified live; npm test: 90 passed, 3 skipped, 0 failed. The repaired news edition advanced to SOCIAL_WRITER during this work and its article appeared on the public front page. Final social/anchor completion remains to be checked; do not duplicate the running workflow.

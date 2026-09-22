@@ -1,0 +1,166 @@
+[
+  {
+    "id": "jetson-thor",
+    "name": "NVIDIA Jetson AGX Thor Developer Kit Bundle",
+    "manufacturer": "NVIDIA",
+    "description": "A Blackwell GPU developer platform with 128 GB memory for physical AI, robotics and multimodal model development. Review the current bundle contents on Seeed.",
+    "category": "NVIDIA Jetson / Edge AI",
+    "tags": [
+      "GPU",
+      "AI systems",
+      "Robotics"
+    ],
+    "image": "/newsroom/hardware/images/jetson-thor.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/NVIDIAr-Jetson-AGX-Thortm-Developer-Kit-Bundle.html",
+    "featured": true,
+    "active": true,
+    "unavailable": false,
+    "badge": "Blackwell GPU",
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/i/m/image__5.png"
+  },
+  {
+    "id": "dgx-spark",
+    "name": "NVIDIA DGX Spark",
+    "manufacturer": "NVIDIA",
+    "description": "A desktop AI system with the GB10 Grace Blackwell Superchip and 128 GB memory for local model development. Seeed marked this listing out of stock and discontinued when checked September 22, 2026.",
+    "category": "Desktop AI Systems",
+    "tags": [
+      "GPU",
+      "AI systems"
+    ],
+    "image": "/newsroom/hardware/images/dgx-spark.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/NVIDIA-DGX-Spark-p-6611.html",
+    "featured": true,
+    "active": true,
+    "unavailable": true,
+    "badge": "Listed as discontinued",
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/100059803---2.jpg"
+  },
+  {
+    "id": "raspberry-pi-5",
+    "name": "Raspberry Pi 5 · 4GB",
+    "manufacturer": "Raspberry Pi",
+    "description": "A compact single-board computer for Linux projects, connected devices and hands-on experimentation.",
+    "image": "/newsroom/hardware/images/raspberry-pi-5.jpg",
+    "category": "Raspberry Pi",
+    "tags": [
+      "single-board computer"
+    ],
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Raspberry-Pi-5-4GB-p-5811.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-102110919-raspberry-pi-5-8gb-45font_1.jpg"
+  },
+  {
+    "id": "recomputer-j3011",
+    "name": "reComputer Robotics J3011",
+    "manufacturer": "Seeed Studio",
+    "description": "A Jetson Orin Nano Super 8GB edge computer designed for robotics development and sensor-driven AI projects.",
+    "image": "/newsroom/hardware/images/recomputer-j3011.jpg",
+    "category": "NVIDIA Jetson / Edge AI",
+    "tags": [
+      "Robotics",
+      "edge AI"
+    ],
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/reComputer-Robotics-J3011-p-6503.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-114110310-recomputer-robotics.jpg"
+  },
+  {
+    "id": "xiao-esp32s3-sense",
+    "name": "XIAO ESP32-S3 Sense",
+    "manufacturer": "Seeed Studio",
+    "description": "A tiny development board with camera and microphone capabilities for connected sensing and embedded ML experiments.",
+    "image": "/newsroom/hardware/images/xiao-esp32s3-sense.jpg",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Cameras / Computer Vision",
+      "embedded ML"
+    ],
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/XIAO-ESP32S3-Sense-p-5639.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/2/-/2-113991115-xiao-esp32-s3-sense_1.jpg"
+  },
+  {
+    "id": "pi-camera-3",
+    "name": "Raspberry Pi Camera Module 3",
+    "manufacturer": "Raspberry Pi",
+    "description": "A Sony IMX708 camera module with autofocus for Raspberry Pi imaging and computer vision projects.",
+    "image": "/newsroom/hardware/images/pi-camera-3.jpg",
+    "category": "Cameras / Computer Vision",
+    "tags": [
+      "Raspberry Pi",
+      "camera"
+    ],
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Raspberry-Pi-Camera-3-p-5574.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-114993028-raspberry-pi-camera-3-45font.jpg"
+  },
+  {
+    "id": "coral-usb",
+    "name": "Coral USB Accelerator",
+    "manufacturer": "Google Coral",
+    "description": "A USB Edge TPU accessory for supported machine-learning inference workloads on an existing host. Check software and model compatibility before choosing.",
+    "image": "/newsroom/hardware/images/coral-usb.jpg",
+    "category": "AI Accelerators",
+    "tags": [
+      "USB",
+      "inference"
+    ],
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Coral-USB-Accelerator-p-2899.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/i/n/inkedaccelerator-dimensions_li.jpg"
+  },
+  {
+    "id": "xiao-esp32s3",
+    "name": "XIAO ESP32-S3",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact Wi-Fi and Bluetooth development board for connected prototypes and microcontroller projects.",
+    "image": "/newsroom/hardware/images/xiao-esp32s3.jpg",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Wi-Fi",
+      "Bluetooth"
+    ],
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-113991114-xiao-esp32s3-font_1.jpg"
+  }
+]
