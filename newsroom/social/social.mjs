@@ -41,18 +41,29 @@ export function validateCaption(draft,story){
   const urls=draft.caption.match(/https?:\/\/[^\s]+/g)||[];if(urls.some(u=>u!==story.url))throw Error('Caption contains an unapproved URL');
   return draft.caption.trim();
 }
+export function completeCaption(draft,story){
+  if(typeof draft?.caption!=='string')return validateCaption(draft,story);
+  const caption=draft.caption.trim();
+  // Only fill a missing link. Never replace or approve an unexpected destination.
+  const urls=caption.match(/https?:\/\/[^\s]+/g)||[];
+  if(urls.length)return validateCaption(draft,story);
+  validateCaption({...draft,caption:caption+'\n\n'+story.url},story);
+  return caption+'\n\n'+story.url;
+}
 export async function prepare(work){const story=await publishedStory(work);atomic(path.join(work,'SOCIAL_SOURCE.json'),story);}
 export async function render(work){
   const story=await publishedStory(work),saved=read(path.join(work,'SOCIAL_SOURCE.json'));
   if(hash(story)!==hash(saved))throw Error('Published story changed. Restart social preparation.');
-  validateCaption(read(path.join(work,'SOCIAL.json')),story);
+  const draft=read(path.join(work,'SOCIAL.json'));
+  const caption=completeCaption(draft,story);
+  atomic(path.join(work,'SOCIAL_READY.json'),{...draft,caption});
   execFileSync('powershell.exe',['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',fileURLToPath(new URL('./card.ps1',import.meta.url)),'-InputFile',path.join(work,'SOCIAL_SOURCE.json'),'-OutputFile',path.join(work,'SOCIAL_CARD.jpg')],{timeout:30000,windowsHide:true,stdio:'pipe'});
 }
 export async function queue(work){
   const state=read(path.join(work,'..','state.json')),last=state.runs.filter(r=>r.status==='FINISHED').at(-1);
   if(last?.role!=='SOCIAL_EDITOR'||last.outcome!=='APPROVE')throw Error('Social publication requires the immediately preceding social editor approval');
   const story=await publishedStory(work);if(hash(story)!==hash(read(path.join(work,'SOCIAL_SOURCE.json'))))throw Error('Story changed after preparation');
-  const caption=validateCaption(read(path.join(work,'SOCIAL.json')),story),bytes=fs.readFileSync(path.join(work,'SOCIAL_CARD.jpg'));
+  const caption=validateCaption(read(path.join(work,fs.existsSync(path.join(work,'SOCIAL_READY.json'))?'SOCIAL_READY.json':'SOCIAL.json')),story),bytes=fs.readFileSync(path.join(work,'SOCIAL_CARD.jpg'));
   if(bytes[0]!==255||bytes[1]!==216||bytes.length>8*1024*1024)throw Error('Expected a JPEG card under 8 MB');
   const folder=dir(story.id);fs.mkdirSync(folder,{recursive:true});const postPath=path.join(folder,'post.json');
   if(!fs.existsSync(postPath)){
