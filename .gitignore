@@ -29,3 +29,12 @@ extra-projects.json
 .wrangler/
 NOVA-Operator-Native-Stable-13/
 archive/
+
+# Private credentials and generated media (presenter PNG source assets are tracked)
+*.dpapi
+*.pem
+*.key
+*.mp4
+*.wav
+*.onnx
+*.pth

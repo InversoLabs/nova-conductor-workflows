@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {libraryRoot,saveLibrary} from '../../src/templates.mjs';
+import {readSchedules,writeSchedules} from '../../src/schedules.mjs';
+import {withSocial} from './workflow.mjs';
+const file=path.join(libraryRoot(),'templates','NEWSROOM.json');
+const original=JSON.parse(fs.readFileSync(file,'utf8'));
+if(!fs.existsSync(file+'.before-social'))fs.copyFileSync(file,file+'.before-social');
+saveLibrary('templates',withSocial(original));
+writeSchedules(readSchedules().map(s=>s.template.id==='NEWSROOM'?{...s,template:withSocial(s.template)}:s));
+console.log('Social roles installed for future newsroom editions. Existing times and enabled states preserved. Instagram stays in preview mode until connected and enabled.');

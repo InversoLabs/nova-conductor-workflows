@@ -1,4 +1,7 @@
 import {invokePublisher} from '../newsroom/scripts/newsroom.mjs';
+import {studioBusy} from '../src/studio-lease.mjs';
+import {anchorRunning,automationStatus,createAnchorPump} from '../newsroom/anchor/automation.mjs';
+import {settings as socialSettings,listPosts,cardFile,connect as connectInstagram,setEnabled as enableInstagram,publishPost,recoverLock,createSocialPump} from '../newsroom/social/social.mjs';
 import {config as newsroomConfig,fetchSources,enrichSources,validateStory} from '../newsroom/scripts/newsroom.mjs';
 import {readSchedules,saveSchedule,writeSchedules,createScheduler} from '../src/schedules.mjs';
 import {atomic,snapshot} from '../src/workflow.mjs';
@@ -29,6 +32,7 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
   function summary(root){const s=readJSON(path.join(root,'state.json'));return {id:projectId(root),name:path.basename(root),root,status:s.status,role:s.role,model:s.config.model,provider:s.config.provider,feedback:redact(s.feedback||''),runs:s.runs.length,updated:fs.statSync(path.join(root,'state.json')).mtime.toISOString()};}
   function listProjects(){for(const dir of roots)if(fs.existsSync(dir))for(const entry of fs.readdirSync(dir,{withFileTypes:true}))if(entry.isDirectory()&&!entry.isSymbolicLink()){const root=path.join(dir,entry.name);if(fs.existsSync(path.join(root,'state.json')))projects.set(projectId(root),root);}return [...projects.values()].flatMap(root=>{try{return [summary(root)];}catch{return [];}}).sort((a,b)=>b.updated.localeCompare(a.updated));}
   function anyRunning(){
+    if(studioBusy()||anchorRunning())return true;
     if([...jobs.values()].some(j=>j.child?.exitCode===null))return true;
     listProjects();for(const root of projects.values()){try{const pid=Number(fs.readFileSync(path.join(root,'conductor.lock'),'utf8'));if(Number.isInteger(pid)&&pid>0){process.kill(pid,0);return true;}}catch{}}
     return false;
@@ -52,6 +56,12 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
   }
   async function api(req,url,data){
     const route=url.pathname;
+    if(req.method==='GET'&&route==='/api/anchor')return automationStatus();
+    if(req.method==='GET'&&route==='/api/social')return {settings:socialSettings(),posts:listPosts()};
+    if(req.method==='POST'&&route==='/api/social/connect')return connectInstagram(data);
+    if(req.method==='POST'&&route==='/api/social/enabled')return enableInstagram(data.enabled);
+    if(req.method==='POST'&&route==='/api/social/publish')return publishPost(data.id);
+    if(req.method==='POST'&&route==='/api/social/unlock')return recoverLock(data.id);
     if(req.method==='GET'&&route==='/api/newsroom'){const c=newsroomConfig();const r=await fetch(c.siteUrl+'/stories.json?v='+Date.now(),{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('Cannot load public newsroom');return r.json();}
     if(req.method==='POST'&&route==='/api/newsroom/draft'){
       const feed=await fetchSources(),urls=(data.story?.sources||[]).map(s=>s.url);feed.sources=feed.sources.filter(s=>urls.includes(s.url));await enrichSources(feed.sources);if(!feed.sources.length||feed.sources.some(s=>s.excerpt.length<500))throw Error('Draft needs a fresh, readable source from the approved newsroom feeds');
@@ -127,12 +137,13 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
       const url=new URL(req.url,origin);
       res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'");
       if(url.pathname==='/favicon.ico'){res.statusCode=204;res.end();return;}
+      if(req.method==='GET'&&url.pathname.startsWith('/social-card/')){res.setHeader('Content-Type','image/jpeg');res.end(fs.readFileSync(cardFile(url.pathname.slice('/social-card/'.length))));return;}
       if(url.pathname==='/health'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({app:'nova-conductor-ui',version:'0.6.0-preview.1'}));return;}
       if(url.pathname.startsWith('/api/')){
         let data={};if(req.method!=='GET'){if(req.method!=='POST'||req.headers.origin!==origin||!req.headers['content-type']?.startsWith('application/json'))throw Object.assign(Error('A same-origin JSON request is required'),{status:403});let raw='';for await(const part of req){raw+=part;if(raw.length>200000)throw Error('Request too large');}data=JSON.parse(raw||'{}');}
         const result=await api(req,url,data);res.setHeader('Content-Type','application/json');res.end(JSON.stringify(result));return;
       }
-      const assets={'/':'index.html','/app.js':'app.js','/style.css':'style.css'};const name=assets[url.pathname];if(!name)throw Object.assign(Error('Not found'),{status:404});res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(path.join(base,'ui',name)));
+      const assets={'/anchor':'anchor.html','/anchor.js':'anchor.js','/':'index.html','/app.js':'app.js','/style.css':'style.css','/social':'social.html','/social.js':'social.js','/social.css':'social.css'};const name=assets[url.pathname];if(!name)throw Object.assign(Error('Not found'),{status:404});res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':name.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(path.join(base,'ui',name)));
     }catch(error){res.statusCode=error.status||400;res.setHeader('Content-Type','application/json');res.end(JSON.stringify({error:redact(error.message)}));}
   });
   const launchScheduled=async s=>{
@@ -141,7 +152,9 @@ export function createUIServer({projectRoots,launch,connect=async url=>new Codex
     initializeWorkflow(root,s.prompt,s.model,s.template,undefined,initialize);projects.set(projectId(root),root);await start(root);return projectId(root);
   };
   const scheduler=projectRoots||process.env.NOVA_SCHEDULER_DISABLED==='1'?null:createScheduler({launch:launchScheduled,busy:anyRunning});
-  server.on('close',()=>scheduler?.close());
+  const socialPump=projectRoots||process.env.NOVA_SCHEDULER_DISABLED==='1'?null:createSocialPump();
+  const anchorPump=projectRoots||process.env.NOVA_SCHEDULER_DISABLED==='1'?null:createAnchorPump({busy:anyRunning});
+  server.on('close',()=>{scheduler?.close();socialPump?.close();anchorPump?.close();});
   server.stopJobs=()=>{for(const [id,job]of jobs)if(job.child?.exitCode===null){const root=projects.get(id);if(root)fs.writeFileSync(path.join(root,'stop.request'),'stop');}};
   return server;
 }

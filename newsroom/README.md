@@ -47,3 +47,7 @@ Production files on the configured server: the `newsroom/public` folder inside t
 ## Launch verification
 
 A live five-step Conductor run completed on the configured Bridge/model and published its article and illustration over SSH. An earlier run was correctly held for missing citations despite an AI approval. Independent launch review subsequently corrected a paper-title attribution and tightened deterministic checks for title confusion and actual word counts. The corrected article carries a visible correction note. AI editorial approval alone is not treated as proof.
+
+## Instagram social team
+
+See [social/README.md](social/README.md) for the optional caption, card, review, and Instagram delivery roles. The social desk defaults to previews until an account is connected and publishing is enabled.

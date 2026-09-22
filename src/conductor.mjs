@@ -1,4 +1,5 @@
 import {recoverReadOnlyReview} from './review-recovery.mjs';
+import {assertStudioIdle} from './studio-lease.mjs';
 import {runRobot} from './robots.mjs';
 import {checkpoint,customWorkflow,currentRole,workflowPrompt,assertWorkflowChanges,workflowOutcome,initializeWorkflow,validateTemplate,loadTemplate,loadAgent,oneShot,listLibrary,saveLibrary} from './templates.mjs';
 import {importProject} from './import-project.mjs';
@@ -58,6 +59,7 @@ export function reopen(root,feedback,role='BUILDER') {
 export function isBusy(error) { return /\b429\b|Too Many Requests|inference is busy/i.test(error.message); }
 export function isDisconnect(error) { return /stream (?:disconnected|closed)|response\.completed|Codex.*disconnect|ECONNRESET|ECONNREFUSED|socket hang up|connection.*(?:closed|reset)/i.test(error.message); }
 export async function run(root,{visible=true,start=startServer,check=runChecks,provider=loadProvider()}={}) {
+  assertStudioIdle();
   root=fs.realpathSync(root); const work=path.join(root,'work'), stateFile=path.join(root,'state.json');
   const lock=path.join(root,'conductor.lock');
   if(fs.existsSync(lock)) {
@@ -66,6 +68,7 @@ export async function run(root,{visible=true,start=startServer,check=runChecks,p
     fs.renameSync(lock,lock+'.stale-'+Date.now());
   }
   fs.writeFileSync(lock,String(process.pid),{flag:'wx'});
+  try{assertStudioIdle();}catch(error){fs.unlinkSync(lock);throw error;}
   let server, stopped=false, active, watcher, viewerOpened=false;
   const state=JSON.parse(fs.readFileSync(stateFile,'utf8'));
   state.config.provider=validateProvider(provider);

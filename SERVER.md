@@ -13,7 +13,7 @@ The newsroom now runs on NOVA-SERVER under the Windows account `justi`, independ
 
 ## Runtime and schedule
 
-The `Nova Conductor Server` Windows task runs Run-Server.ps1 as `justi` with an interactive token and limited privileges. The server user must stay signed in; the screen can be locked. The task starts at user logon, retries after failure, and has daily wake triggers. On this server (Central time), 09:59 and 18:59 wake it before the 08:00 and 17:00 Pacific publication slots. The app uses America/Los_Angeles when deciding which edition is due. The server must remain powered on, with justi signed in, and have internet access. Wake requires hardware/Windows support.
+The `Nova Conductor Server` Windows task runs Run-Server.ps1 as `justi` with an interactive token and limited privileges. The server user must stay signed in; the screen can be locked. The task starts at user logon, retries after failure, and has daily wake triggers. On this server (Central time), 05:59 and 14:59 wake it before the 06:00 and 15:00 Central publication slots. The app uses America/Chicago when deciding which edition is due. The server must remain powered on, with justi signed in, and have internet access. Wake requires hardware/Windows support.
 
 Codex 0.155.1 is installed privately in `runtime/node_modules`; the existing global Codex installation is unchanged. Node 22.22.0 runs the service. A private PowerShell 7.6.5 runtime is in runtime/powershell. NOVA_CONDUCTOR_HEADLESS=1 suppresses native viewer windows for background jobs. On an interactive workstation, normal viewer behavior is unchanged.
 
@@ -42,4 +42,4 @@ The verified configuration uses Codex's unelevated Windows sandbox, retaining wo
 
 Nova Desktop's bridge must be running on the server. Its current GUI build requires Start Bridge after reopening; Conductor does not silently change the selected provider or start an unauthenticated replacement. After reboot, sign in and start the bridge before expecting model work to succeed.
 
-Migration verified on 2026-09-21: native WRITER → CHECK → EDITOR APPROVE → PUBLISH completed on NOVA-SERVER. The reused source was recognized as already published and public article/image verification passed. Controller stop/restart released and reacquired its port. The server schedule is enabled at 08:00 and 17:00 America/Los_Angeles; the laptop schedule remains disabled. Run-Server uses the existing process guardian so its owned controller tree exits when the task ends.
+Migration verified on 2026-09-21: native WRITER → CHECK → EDITOR APPROVE → PUBLISH completed on NOVA-SERVER. The reused source was recognized as already published and public article/image verification passed. Controller stop/restart released and reacquired its port. The server schedule is enabled at 06:00 and 15:00 America/Chicago; the laptop schedule remains disabled. Run-Server uses the existing process guardian so its owned controller tree exits when the task ends.

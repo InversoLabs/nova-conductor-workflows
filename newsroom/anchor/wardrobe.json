@@ -1,0 +1,44 @@
+[
+  {
+    "id": "charcoal",
+    "file": "presenter-v1.png",
+    "approved": true,
+    "sha256": "7966e5c8c2946eb90915332c8de4d2d8ee5957f8eb40ed3eb9606e29e523fc57"
+  },
+  {
+    "id": "navy",
+    "file": "presenter-navy.png",
+    "approved": true,
+    "sha256": "c29127fbc1e27a0123d0f2b85b329212af0b18d6c9dfa6f2d80349b5ca5fe812",
+    "reviewedAt": "2026-09-22T19:27:49.086Z",
+    "review": {
+      "clipSeconds": 4.8,
+      "evidence": "Successful SadTalker render; wide and phone frames inspected; both H264/AAC exports fully decoded; expected dimensions and duration verified",
+      "testDirectory": ".nova-trials/wardrobe-test/navy"
+    }
+  },
+  {
+    "id": "dress",
+    "file": "presenter-dress.png",
+    "approved": true,
+    "sha256": "2caf8afbbf5a3070329ea4aed12b19bd1017970352ab003948507cc4f375b3b6",
+    "reviewedAt": "2026-09-22T19:27:49.088Z",
+    "review": {
+      "clipSeconds": 4.8,
+      "evidence": "Successful SadTalker render; wide and phone frames inspected; both H264/AAC exports fully decoded; expected dimensions and duration verified",
+      "testDirectory": ".nova-trials/wardrobe-test/dress"
+    }
+  },
+  {
+    "id": "gray",
+    "file": "presenter-gray.png",
+    "approved": true,
+    "sha256": "5d35daacb6b6f43c6608e08339618bfdacfda1000dc9ced07e69e343f9a7d205",
+    "reviewedAt": "2026-09-22T19:27:49.088Z",
+    "review": {
+      "clipSeconds": 4.8,
+      "evidence": "Successful SadTalker render; wide and phone frames inspected; both H264/AAC exports fully decoded; expected dimensions and duration verified",
+      "testDirectory": ".nova-trials/wardrobe-test/gray"
+    }
+  }
+]

@@ -2,6 +2,7 @@
 import argparse
 import mimetypes
 from pathlib import Path
+from video import serve_video
 from socketserver import ThreadingMixIn
 from wsgiref.simple_server import WSGIServer, make_server
 from legacy.foundry.registry_auth_runtime import RegistryAuthApp, load_public_registry_identity, LANDING_HTML
@@ -28,8 +29,10 @@ def app(environ, start_response):
         folder = (ROOT / 'newsroom' / 'public').resolve()
         target = (folder / relative).resolve()
         if target.is_dir(): target = target / 'index.html'
-        if folder not in target.parents or not target.is_file() or target.suffix not in {'.html','.css','.js','.json','.svg','.xml'}:
+        if folder not in target.parents or not target.is_file() or target.suffix not in {'.html','.css','.js','.json','.svg','.xml','.jpg','.mp4'}:
             return respond(environ, start_response, b'Not found', 'text/plain', '404 Not Found')
+        if target.suffix == '.mp4':
+            return serve_video(environ, start_response, target)
         return respond(environ, start_response, target.read_bytes(), mimetypes.guess_type(target.name)[0] or 'application/octet-stream')
 
     if path in FILES or path in {'/archive', '/archive/', '/healthz', '/robots.txt', '/sitemap.xml'}:

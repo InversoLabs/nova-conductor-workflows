@@ -188,3 +188,9 @@ Builders may update BUILD_PLAN.md without stopping the run. Conductor saves the 
 Provider selection is global: new and resumed projects use the provider selected in menu 8 (menu 9 is an alias). Existing project snapshots never switch the global provider. Provider settings remember each provider's last endpoint and key-variable name; pressing Enter preserves them. A running session keeps its provider until stopped.
 
 Server deployment and operations: [SERVER.md](SERVER.md). The tested NOVA-SERVER setup runs independently of the laptop, with its server user signed in.
+
+Instagram social team: [setup and recovery](newsroom/social/README.md). Adds a caption writer, JPEG card robot, social editor, and durable publisher after each newsroom edition. Preview mode is the default; connect and enable Instagram from Studio → Social team.
+
+Anchor desk: [setup, wardrobe rotation and recovery](newsroom/anchor/README.md).
+For the current production checkpoint and the next run to inspect, start with
+[HANDOFF.md](HANDOFF.md).

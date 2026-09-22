@@ -14,7 +14,7 @@ export function saveSchedule(data){
   new Intl.DateTimeFormat('en-US',{timeZone:data.timeZone}).format();
   if(!Array.isArray(data.times)||!data.times.length||data.times.length>24||data.times.some(t=>!/^([01]\d|2[0-3]):[0-5]\d$/.test(t)))throw Error('Use daily times in HH:MM format');
   const list=readSchedules(),prior=list.find(x=>x.id===data.id);
-  const s={id:prior?.id||crypto.randomUUID(),name:data.name.trim(),prompt:data.prompt,model:data.model,template:validateTemplate(data.template),timeZone:data.timeZone,times:[...new Set(data.times)].sort(),enabled:data.enabled===true,createdAt:prior?.createdAt||new Date().toISOString(),lastSlot:prior?.lastSlot||null,lastProject:prior?.lastProject||null,lastError:prior?.lastError||'',updatedAt:new Date().toISOString()};
+  const s={id:prior?.id||crypto.randomUUID(),name:data.name.trim(),prompt:data.prompt,model:data.model,template:validateTemplate(data.template),timeZone:data.timeZone,times:[...new Set(data.times)].sort(),enabled:data.enabled===true,createdAt:prior?.createdAt||new Date().toISOString(),lastSlot:prior?.lastSlot||null,pendingSlot:prior?.pendingSlot||null,lastProject:prior?.lastProject||null,lastError:prior?.lastError||'',updatedAt:new Date().toISOString()};
   writeSchedules([...list.filter(x=>x.id!==s.id),s]);return s;
 }
 export function dueSlot(s,now=new Date()){
@@ -25,11 +25,15 @@ export function dueSlot(s,now=new Date()){
 }
 export function createScheduler({launch,busy,now=()=>new Date()}){
   let ticking=false;
-  async function tick(){if(ticking||busy())return;const lock=scheduleFile()+'.lock';fs.mkdirSync(path.dirname(lock),{recursive:true});let fd;
+  async function tick(){if(ticking)return;const lock=scheduleFile()+'.lock';fs.mkdirSync(path.dirname(lock),{recursive:true});let fd;
   try{fd=fs.openSync(lock,'wx');fs.writeFileSync(fd,String(process.pid));}catch(e){if(e.code!=='EEXIST')throw e;try{const pid=Number(fs.readFileSync(lock,'utf8'));if(!Number.isInteger(pid)||pid<=0){if(Date.now()-fs.statSync(lock).mtimeMs>60000)fs.unlinkSync(lock);return;}process.kill(pid,0);}catch(error){if(error.code==='ESRCH')fs.unlinkSync(lock);}return;}
-  ticking=true;try{for(const s of readSchedules()){const slot=s.enabled?dueSlot(s,now()):null;if(!slot)continue;
+  ticking=true;try{const schedules=readSchedules();let changed=false;
+    for(const s of schedules){if(s.enabled&&!s.pendingSlot){const slot=dueSlot(s,now());if(slot){s.pendingSlot=slot;changed=true;}}}
+    if(changed)writeSchedules(schedules);
+    if(busy())return;
+    for(const s of readSchedules()){const slot=s.enabled?s.pendingSlot:null;if(!slot)continue;
     // Persist claim before launch. A restart never duplicates an uncertain run.
-    s.lastSlot=slot;s.lastError='';writeSchedules(readSchedules().map(x=>x.id===s.id?s:x));
+    s.lastSlot=slot;s.pendingSlot=null;s.lastError='';writeSchedules(readSchedules().map(x=>x.id===s.id?s:x));
     try{s.lastProject=await launch(s);}catch(e){s.lastError=e.message;}
     writeSchedules(readSchedules().map(x=>x.id===s.id?{...x,lastSlot:s.lastSlot,lastProject:s.lastProject,lastError:s.lastError}:x));break;
   }}finally{ticking=false;fs.closeSync(fd);fs.unlinkSync(lock);}}
