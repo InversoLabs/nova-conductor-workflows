@@ -2,8 +2,14 @@
 
 ## Start here after the 3 PM run
 
-This checkpoint was prepared before the September 22 **15:00 America/Chicago**
-edition. Its outcome is not yet known. Inspect live state before launching,
+The September 22 **15:00 America/Chicago** edition started but stopped at 15:21
+with an editor BLOCKED result. The editor incorrectly said several names were
+absent from the collected source; the draft also contained narrower wording
+errors. At approximately 15:43 Central, the same project was reopened at WRITER
+with source-specific repair guidance and the updated editorial policy below.
+Run 0013 was verified running. Its final outcome remains to be checked.
+Project: `Newsroom edition-1790107205713` (UI ID `be0053dc04f59dcab626`).
+Inspect live state before launching,
 reopening, resetting, or publishing anything. Do not create a second schedule.
 
 Production runs on NOVA-SERVER, not the laptop. The server's user must remain
@@ -69,7 +75,20 @@ state and do not blindly repost uncertain Instagram submissions.
   `.nova-trials/wardrobe-test`. These large generated artifacts remain on disk.
 - Before the scheduled run: anchor and Instagram enabled, empty anchor queue,
   no GPU lease, GPT loaded at 16384 context, schedule enabled without errors.
-- The first fully scheduled combined cycle remains to be verified after 3 PM.
+- The resumed scheduled cycle remains to be verified; do not create a duplicate.
+
+## Editorial repair update
+
+`newsroom/editorial-policy.mjs` updates the saved library, schedule template and
+current project: editor reads complete UTF-8 evidence, searches before declaring
+names unsupported, and uses REVISE for fixable copy. Its opt-in
+`blockedRepairLimit: 2` sends a BLOCKED result to the existing revision role for
+up to two attempts while preserving the original outcome in history. It never
+converts a blocked result into approval. Exhausted repairs or unusable sources
+still hold publication. Templates without this option retain their old behavior.
+Future newsroom flows allow up to 36 total role runs to accommodate the bounded
+repair and downstream social stages. Previous state/schedules/library are saved
+under the current project's `before-editorial-repair-*` folder.
 
 ## Where to inspect results
 

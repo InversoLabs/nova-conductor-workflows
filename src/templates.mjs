@@ -71,6 +71,7 @@ export function validateTemplate(value){
     for(const f of r.outputs)if(!r.writes.includes('*')&&!r.writes.includes(f))throw Error('Output must be writable: '+f);
     if(!r.routes||!Object.keys(r.routes).length||Object.keys(r.routes).some(o=>!outcomes.includes(o)))throw Error('Invalid routes for '+r.id);
     if(r.routes.BLOCKED!=='NEEDS_ATTENTION')throw Error('Each role needs BLOCKED -> NEEDS_ATTENTION');
+    if(r.blockedRepairLimit!==undefined&&(!Number.isInteger(r.blockedRepairLimit)||r.blockedRepairLimit<1||r.blockedRepairLimit>2||!r.routes.REVISE))throw Error('Blocked repair requires a REVISE route and a limit of 1–2');
     if(!Object.keys(r.routes).some(o=>o!=='BLOCKED'))throw Error('Role has no success route');
   }
   if(!ids.has(t.start))throw Error('Missing starting role');
@@ -100,7 +101,7 @@ export const customWorkflow=s=>!!s.workflow&&!s.workflow.engine;
 export function currentRole(s){const role=s.workflow?.roles.find(r=>r.id===s.role);if(customWorkflow(s)&&!role)throw Error('Unknown workflow role: '+s.role);return role;}
 export function workflowPrompt(s){
   const r=currentRole(s);
-  return `Original user request (also saved in REQUEST.md):\n${s.prompt}\n\nYou are ${r.name} (${r.id}) in a fresh 16K Codex session. Work in the current project with Codex tools and Windows PowerShell. Preserve REQUEST.md. Follow existing project instructions without expanding the request.\n\nResponsibility:\n${r.prompt}\n\nRead these inputs: ${r.inputs.join(', ')||'the existing project as relevant'}.\nRequired saved outputs: ${r.outputs.join(', ')||'none'}.\nFile access: ${r.access}; writable paths: ${r.writes.join(', ')||'none'}. Other roles own their declared artifacts${s.workflow.allowBuildPlanUpdates&&r.id==='BUILDER'?', except you may update BUILD_PLAN.md':''}; preserve their requirements.\n\n${s.plannerBaseline&&r.access==='read-only'?'Read ../planner-baseline.md for original planner requirements; builder plan updates cannot remove original acceptance requirements.\n\n':''}${s.guidance?'User guidance:\n'+s.guidance+'\n\n':''}${s.handoff?'Latest project handoff:\n'+s.handoff.slice(-6000)+'\n\n':''}Finish with a Markdown heading containing exactly one of: ${Object.keys(r.routes).map(o=>'# '+o).join(', ')}. Follow it with concrete results and verification evidence. For REVISE include an ordered checklist using - [ ] with repairs and how to verify each. Use BLOCKED if unable to finish. Do not claim unverified results. Conductor owns routing; no JSON report is required.`;
+  return `Original user request (also saved in REQUEST.md):\n${s.prompt}\n\nYou are ${r.name} (${r.id}) in a fresh 16K Codex session. Work in the current project with Codex tools and Windows PowerShell. Preserve REQUEST.md. Follow existing project instructions without expanding the request.\n\nResponsibility:\n${r.prompt}\n\nRead these inputs: ${r.inputs.join(', ')||'the existing project as relevant'}.\nRequired saved outputs: ${r.outputs.join(', ')||'none'}.\nFile access: ${r.access}; writable paths: ${r.writes.join(', ')||'none'}. Other roles own their declared artifacts${s.workflow.allowBuildPlanUpdates&&r.id==='BUILDER'?', except you may update BUILD_PLAN.md':''}; preserve their requirements.\n\n${s.plannerBaseline&&r.access==='read-only'?'Read ../planner-baseline.md for original planner requirements; builder plan updates cannot remove original acceptance requirements.\n\n':''}${s.guidance?'User guidance:\n'+s.guidance+'\n\n':''}${s.handoff?'Latest project handoff:\n'+s.handoff.slice(-6000)+'\n\n':''}Finish with a Markdown heading containing exactly one of: ${Object.keys(r.routes).map(o=>'# '+o).join(', ')}. Follow it with concrete results and verification evidence. For REVISE include an ordered checklist using - [ ] with repairs and how to verify each. Use REVISE for fixable problems when a revision route exists; reserve BLOCKED for obstacles that cannot be passed to that repair role. Do not claim unverified results. Conductor owns routing; no JSON report is required.`;
 }
 export function canWrite(s,f){
   const r=currentRole(s),owned=new Set(s.workflow.roles.filter(x=>x.id!==r.id).flatMap(x=>x.writes).filter(x=>x!=='*').map(x=>x.toLowerCase()));
@@ -132,6 +133,9 @@ export function workflowOutcome(s,work,output,checks){
   if(outcome==='REVISE'&&!/^- \[ \] .+/m.test(output))throw Error('Revision requires a concrete checklist');
   if(!['BLOCKED','REVISE'].includes(outcome))for(const f of r.outputs)if(!fs.existsSync(path.join(work,f))||!fs.statSync(path.join(work,f)).isFile()||!fs.readFileSync(path.join(work,f),'utf8').trim())throw Error('Missing required output: '+f);
   let next=r.routes[outcome];
+  // Opt-in editorial fallback: never approve a blocked result, only offer the
+  // existing repair role a bounded chance to resolve it. Preserve the outcome.
+  if(outcome==='BLOCKED'&&r.blockedRepairLimit&&s.runs.filter(run=>run.role===r.id&&run.status==='FINISHED'&&run.outcome==='BLOCKED').length<r.blockedRepairLimit)next=r.routes.REVISE;
   if(next==='COMPLETE'&&!checks?.passed)next='NEEDS_ATTENTION';
   return {outcome,next};
 }
