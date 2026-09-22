@@ -1,4 +1,4 @@
-import { categories, disclosure, purchaseUrl, validateCatalog } from './core.js';
+import { categories, disclosure, purchaseUrl, validateCatalog } from './core.js?v=2';
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let data;
 async function load() {
@@ -17,7 +17,7 @@ async function start() {
     try {
       const {products,config}=await load();
       if (shop) {
-        let category='Featured', query='';
+        let category='All hardware', query='';
         shop.innerHTML=`<div class="hardware-tools"><label>Find your next build<input id="hardware-search" type="search" placeholder="Search boards, cameras, robotics…"></label><div class="hardware-filters" aria-label="Hardware categories">${categories.map(c=>`<button type="button" data-category="${esc(c)}" aria-pressed="${c===category}">${esc(c)}</button>`).join('')}</div></div><p class="affiliate-disclosure">${disclosure} Purchases, shipping and support are handled by Seeed.</p><p id="hardware-count" role="status"></p><div id="hardware-results" class="hardware-grid"></div>`;
         const render=()=>{
           const filtered=products.filter(p=>p.active&&(category==='All hardware'||(category==='Featured'?p.featured:p.category===category||p.tags.includes(category)))&&[p.name,p.description,p.manufacturer,...p.tags].join(' ').toLowerCase().includes(query));

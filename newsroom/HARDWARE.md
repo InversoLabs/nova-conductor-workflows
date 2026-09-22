@@ -2,7 +2,7 @@
 
 Live route: https://inversolabs.us/newsroom/hardware/
 
-The newsroom navigation has one Hardware link beside Open source. Per the revised scope, there are no front-page product sections or article recommendations. The storefront is a static page in the existing site, with responsive cards, search, category filters and external Seeed checkout. No cart, payments, inventory service or new runtime dependencies.
+The newsroom navigation has one Hardware link beside Open source. The right-hand front-page column now includes a compact rotating product spotlight beneath the newsroom note, added at the user’s request. Article recommendations remain deferred. The storefront is a static page in the existing site, with responsive cards, search, category filters and external Seeed checkout. No cart, payments, inventory service or new runtime dependencies.
 
 ## Maintenance
 
@@ -12,10 +12,14 @@ Add a verified product by copying one record, choosing a unique lowercase hyphen
 
 The single affiliate setting is SEEED_AFFILIATE_CODE in `newsroom/site/hardware/config.json`. `core.js` uses URL/searchParams.set to replace tracking safely, preserving other query parameters and fragments. It accepts only HTTPS Seeed hosts and adds sensecap_affiliate plus referring_service=link to every outbound product link. Supplier dispatch is isolated in purchaseUrl for future expansion. Links carry sponsored/noopener/noreferrer and open Seeed externally. Disclosure appears above the cards.
 
-Initial catalog checked September 22, 2026: Raspberry Pi 5 4GB, Pi Camera 3, XIAO ESP32-S3 and Sense, Coral USB Accelerator, reComputer Robotics J3011, Jetson AGX Thor Developer Kit Bundle, and DGX Spark. DGX Spark was marked out of stock/discontinued by Seeed; its card explicitly notes that and uses View listing rather than Buy. No standalone RTX graphics-card product was verified, so none is advertised. Every record includes its official source URL. Category shelves without curated products show an explicit empty state.
+Expanded catalog checked September 22, 2026: 32 active products covering Raspberry Pi boards, cooling, power and cables; Arduino UNO Mini; XIAO microcontrollers; Grove creator kits, sensors and OLED displays; camera boards; Coral and Jetson systems. DGX Spark was removed at the user’s request. Newly added listings with unavailable status were excluded. All hardware is the default view, with a smaller Featured selection. Every record includes its official source URL and product-image provenance. No standalone RTX graphics-card product was verified, so none is advertised. Category shelves without curated products show an explicit empty state.
 
 ## Deployment
 
 Copy the hardware directory into the server's `C:\Users\justi\Documents\inversolabs-homepage\newsroom\public\hardware`, and the updated newsroom/site/index.html to public/index.html. Also copy those source files into the server Conductor checkout at `C:\Users\justi\Documents\Nova Conductor Studio\newsroom\site` so later deployments preserve the change. Upload assets before navigation. Back up existing index.html first. Do not deploy local stories.json or replace runtime news, videos, images or queues. Existing Python hosting supports these routes/extensions; no service restart required.
 
 Article relationships are deferred by user request. Future automation can assign stable catalog IDs once that feature is wanted; it should never duplicate product details into story prose or silently add affiliate recommendations.
+
+## Front-page spotlight
+
+spotlight.js reuses the catalog and affiliate helper. It rotates active, featured, available products every eight seconds, pauses on hover/focus or a hidden tab, respects reduced motion, and provides previous/next and pause controls. The app.js render includes its slot under the right-hand newsroom note, including after topic/search rerenders. Deploy app.js and index.html along with hardware assets for this feature. Catalog defaults to All hardware (32 products); Featured remains a curated subset.

@@ -21,8 +21,8 @@ test('Purchase URLs reject unsafe destinations and missing configuration',()=>{
 test('Catalog is valid and all local product images exist',async()=>{
   const products=JSON.parse(await readFile(new URL('catalog.json',root),'utf8'));
   validateCatalog(products,config);
-  assert.ok(products.length>=8);
+  assert.ok(products.filter(p=>p.active).length>=30);
   for(const p of products){const image=await readFile(new URL('images/'+p.id+'.jpg',root));assert.equal(image[0],255);assert.equal(image[1],216);}
-  assert.equal(products.find(p=>p.id==='dgx-spark').unavailable,true);
+  assert.equal(products.some(p=>p.id==='dgx-spark'),false);
   assert.throws(()=>validateCatalog([...products,products[0]],config));
 });

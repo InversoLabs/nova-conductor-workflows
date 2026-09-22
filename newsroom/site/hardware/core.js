@@ -1,4 +1,4 @@
-export const categories = ['Featured', 'All hardware', 'Desktop AI Systems', 'Raspberry Pi', 'NVIDIA Jetson / Edge AI', 'Arduino / Microcontrollers', 'AI Accelerators', 'Robotics', 'Cameras / Computer Vision', 'Storage', 'Power', 'Accessories'];
+export const categories = ['Featured', 'All hardware', 'Raspberry Pi', 'NVIDIA Jetson / Edge AI', 'Arduino / Microcontrollers', 'AI Accelerators', 'Robotics', 'Cameras / Computer Vision', 'Storage', 'Power', 'Accessories'];
 export const disclosure = 'InversoLabs may earn a commission from purchases made through hardware links.';
 export function affiliateUrl(raw, config) {
   const url = new URL(raw);

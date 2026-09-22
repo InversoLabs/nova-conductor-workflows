@@ -23,28 +23,6 @@
     "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/i/m/image__5.png"
   },
   {
-    "id": "dgx-spark",
-    "name": "NVIDIA DGX Spark",
-    "manufacturer": "NVIDIA",
-    "description": "A desktop AI system with the GB10 Grace Blackwell Superchip and 128 GB memory for local model development. Seeed marked this listing out of stock and discontinued when checked September 22, 2026.",
-    "category": "Desktop AI Systems",
-    "tags": [
-      "GPU",
-      "AI systems"
-    ],
-    "image": "/newsroom/hardware/images/dgx-spark.jpg",
-    "supplier": "seeed",
-    "seeedUrl": "https://www.seeedstudio.com/NVIDIA-DGX-Spark-p-6611.html",
-    "featured": true,
-    "active": true,
-    "unavailable": true,
-    "badge": "Listed as discontinued",
-    "createdAt": "2026-09-22",
-    "updatedAt": "2026-09-22",
-    "sourceVerifiedAt": "2026-09-22",
-    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/100059803---2.jpg"
-  },
-  {
     "id": "raspberry-pi-5",
     "name": "Raspberry Pi 5 · 4GB",
     "manufacturer": "Raspberry Pi",
@@ -162,5 +140,524 @@
     "updatedAt": "2026-09-22",
     "sourceVerifiedAt": "2026-09-22",
     "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-113991114-xiao-esp32s3-font_1.jpg"
+  },
+  {
+    "id": "pi-display-cable",
+    "name": "Raspberry Pi 5 Display Cable · 300mm",
+    "manufacturer": "Raspberry Pi",
+    "description": "Official 300mm display adapter cable for Raspberry Pi 5. Check the connector requirements of your display.",
+    "category": "Accessories",
+    "tags": [
+      "Raspberry Pi",
+      "display"
+    ],
+    "image": "/newsroom/hardware/images/pi-display-cable.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Raspberry-Pi-5-Official-Display-Cable-Standard-300mm-p-5818.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-114993248-raspberry-pi-camera-cable-standard---mini200mm-45font.jpg"
+  },
+  {
+    "id": "pi-camera-cable",
+    "name": "Raspberry Pi 5 Camera Cable · 300mm",
+    "manufacturer": "Raspberry Pi",
+    "description": "Official 300mm camera adapter cable for connecting a compatible camera to Raspberry Pi 5.",
+    "category": "Accessories",
+    "tags": [
+      "Raspberry Pi",
+      "Cameras / Computer Vision"
+    ],
+    "image": "/newsroom/hardware/images/pi-camera-cable.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Raspberry-Pi-5-Official-Camera-Cable-Standard-300mm-p-5817.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-114993247-raspberry-pi-camera-cable-standard---mini200mm-45font.jpg"
+  },
+  {
+    "id": "pi-active-cooler",
+    "name": "Raspberry Pi Active Cooler",
+    "manufacturer": "Raspberry Pi",
+    "description": "An official heatsink and variable-speed blower for cooling Raspberry Pi 5 during sustained workloads.",
+    "category": "Accessories",
+    "tags": [
+      "Raspberry Pi",
+      "cooling"
+    ],
+    "image": "/newsroom/hardware/images/pi-active-cooler.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Raspberry-Pi-Active-Cooler-p-5813.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-114993229-active-cooler-first.jpg"
+  },
+  {
+    "id": "pi-power-us",
+    "name": "Raspberry Pi 27W USB-C Power Supply · US",
+    "manufacturer": "Raspberry Pi",
+    "description": "Official black USB-C PD power supply for Raspberry Pi 5. This listing is the US plug version.",
+    "category": "Power",
+    "tags": [
+      "Raspberry Pi",
+      "USB-C"
+    ],
+    "image": "/newsroom/hardware/images/pi-power-us.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/27W-USB-C-PD-Power-Supply-Black-US-Version-p-5812.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-106990428-27w-usb-c-power-supply-first.jpg"
+  },
+  {
+    "id": "pi5-8gb",
+    "name": "Raspberry Pi 5 · 8GB",
+    "manufacturer": "Raspberry Pi",
+    "description": "The 8GB Raspberry Pi 5 single-board computer for Linux development, home projects and connected applications.",
+    "category": "Raspberry Pi",
+    "tags": [
+      "Linux",
+      "single-board computer"
+    ],
+    "image": "/newsroom/hardware/images/pi5-8gb.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Raspberry-Pi-5-8GB-p-5810.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-102110919-raspberry-pi-5-8gb-45font.jpg"
+  },
+  {
+    "id": "xiao-rp2040-plus",
+    "name": "XIAO RP2040 Plus",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact RP2040 development board with additional GPIO pads and battery management for embedded prototypes.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "RP2040",
+      "Raspberry Pi",
+      "battery"
+    ],
+    "image": "/newsroom/hardware/images/xiao-rp2040-plus.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Seeed-Studio-XIAO-RP2040-Plus-p-6932.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/100059977-gallery_img_1_1.jpg"
+  },
+  {
+    "id": "amb82-mini",
+    "name": "Realtek AMB82-Mini AI Camera Board",
+    "manufacturer": "Realtek",
+    "description": "An RTL8735BDM-based development board for connected camera and embedded AI projects with Arduino development support.",
+    "category": "Cameras / Computer Vision",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "camera",
+      "Wi-Fi"
+    ],
+    "image": "/newsroom/hardware/images/amb82-mini.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/AMB82-MINI-RTL8735B-IoT-AI-Camera-Dev-Board-p-5584.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/6/-/6-amb82-mini-_rtl8735b_-iot-ai-camera-dev.-board-feature.jpg"
+  },
+  {
+    "id": "can-fd-shield",
+    "name": "CAN FD Shield for Arduino",
+    "manufacturer": "Seeed Studio",
+    "description": "Add CAN FD and CAN 2.0 connectivity to a compatible Arduino project through an SPI interface.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Accessories",
+      "CAN",
+      "shield"
+    ],
+    "image": "/newsroom/hardware/images/can-fd-shield.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/CAN-FD-Shield-for-Arduino-p-5604.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-102991776canbed-elite-atmega32u4-45font_1.jpg"
+  },
+  {
+    "id": "grove-creator-alpha",
+    "name": "Grove Creator Kit · Alpha",
+    "manufacturer": "Seeed Studio",
+    "description": "A collection of 20 Grove modules for experimenting with electronics. Check the contents and required controller on Seeed.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Grove",
+      "kit",
+      "sensors"
+    ],
+    "image": "/newsroom/hardware/images/grove-creator-alpha.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-Creator-Kit-p-5453.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/1/110020228-font.jpg"
+  },
+  {
+    "id": "grove-creator-beta",
+    "name": "Grove Creator Kit · Beta",
+    "manufacturer": "Seeed Studio",
+    "description": "A 30-module Grove collection with basic components and additional sensors for electronics experiments.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Grove",
+      "kit",
+      "sensors"
+    ],
+    "image": "/newsroom/hardware/images/grove-creator-beta.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-Creator-Kit-b-p-5464.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/1/110020269_front-05.jpg"
+  },
+  {
+    "id": "grove-orp",
+    "name": "Grove ORP Sensor Kit Pro",
+    "manufacturer": "Seeed Studio",
+    "description": "An oxidation-reduction potential sensing kit with a probe for liquid-monitoring projects. Review calibration and operating requirements.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Grove",
+      "sensors",
+      "water"
+    ],
+    "image": "/newsroom/hardware/images/grove-orp.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-ORP-Sensor-Kit-Pro-p-5570.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-110020370-grove--orp-sensor-kit-pro-45font.jpg"
+  },
+  {
+    "id": "arduino-uno-mini",
+    "name": "Arduino UNO Mini Limited Edition",
+    "manufacturer": "Arduino",
+    "description": "A miniaturized, fully functioning UNO board with a USB-C connector and limited-edition styling.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Arduino",
+      "UNO",
+      "USB-C"
+    ],
+    "image": "/newsroom/hardware/images/arduino-uno-mini.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Arduino-UNO-Mini-Limited-Edition-p-5281.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/102991614_preview-07.jpg"
+  },
+  {
+    "id": "xiao-nrf52840-sense",
+    "name": "XIAO nRF52840 Sense",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact Bluetooth Low Energy board with a microphone and six-axis IMU for sensing and tinyML projects.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Bluetooth",
+      "sensors",
+      "tinyML"
+    ],
+    "image": "/newsroom/hardware/images/xiao-nrf52840-sense.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Seeed-XIAO-BLE-Sense-nRF52840-p-5253.html",
+    "featured": true,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-102010469-seeed-studio-xiao-nrf52840-sense-45font-logo.jpg"
+  },
+  {
+    "id": "xiao-nrf52840",
+    "name": "XIAO nRF52840",
+    "manufacturer": "Seeed Studio",
+    "description": "A small Bluetooth Low Energy development board for connected devices and low-power embedded prototypes.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Bluetooth",
+      "IoT"
+    ],
+    "image": "/newsroom/hardware/images/xiao-nrf52840.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Seeed-XIAO-BLE-nRF52840-p-5201.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/2/-/2-102010448-seeed-studio-xiao-nrf52840-45font-logo.jpg"
+  },
+  {
+    "id": "arduino-greenhouse",
+    "name": "Greenhouse Monitoring Kit for Arduino",
+    "manufacturer": "Seeed Studio",
+    "description": "A project kit for building a greenhouse monitoring system with an Arduino Nano and connected sensing components. Review the exact kit contents on Seeed.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "kit",
+      "sensors",
+      "gardening"
+    ],
+    "image": "/newsroom/hardware/images/arduino-greenhouse.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/GreenHouse-Monitoring-System-using-Arduino-p-5209.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/e/2/e21011019-1.png"
+  },
+  {
+    "id": "grove-oled-066",
+    "name": "Grove OLED Display · 0.66 inch",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact SSD1306 monochrome display with 64 × 48 resolution and an I2C interface for project readouts.",
+    "category": "Accessories",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "Grove",
+      "display"
+    ],
+    "image": "/newsroom/hardware/images/grove-oled-066.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-OLED-Display-0-66-SSD1306-v1-0-p-5096.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/2/2/222.png"
+  },
+  {
+    "id": "grove-oled-112",
+    "name": "Grove OLED Display · 1.12 inch",
+    "manufacturer": "Seeed Studio",
+    "description": "A 128 × 128 monochrome SH1107 display with I2C and SPI interfaces for text and graphics.",
+    "category": "Accessories",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "Raspberry Pi",
+      "Grove",
+      "display"
+    ],
+    "image": "/newsroom/hardware/images/grove-oled-112.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-OLED-Display-1-12-SH1107-V3-0-p-5011.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/10402050_main-02.png"
+  },
+  {
+    "id": "grove-oled-yellow-blue",
+    "name": "Grove Yellow/Blue OLED · 0.96 inch",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact yellow-and-blue OLED module for displaying status and sensor readings. See the listing for interface and wiring requirements.",
+    "category": "Accessories",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "Grove",
+      "display"
+    ],
+    "image": "/newsroom/hardware/images/grove-oled-yellow-blue.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-OLED-Yellow-Blue-Display-0-96-SSD1315-V1-0-p-5010.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/10402049_feature-02-min.png"
+  },
+  {
+    "id": "xiao-rgb-matrix",
+    "name": "XIAO 6 × 10 RGB LED Matrix",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact extension board with 60 WS2812B LEDs for colorful XIAO projects and wearable experiments.",
+    "category": "Accessories",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "LED",
+      "XIAO"
+    ],
+    "image": "/newsroom/hardware/images/xiao-rgb-matrix.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/6x10-RGB-MATRIX-for-XIAO-p-5771.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/2/-/2-6x10-rgb-matrix-for-xiao-font_1_1.jpg"
+  },
+  {
+    "id": "xiao-ov5640",
+    "name": "OV5640 Camera for XIAO ESP32S3 Sense",
+    "manufacturer": "Seeed Studio",
+    "description": "An OV5640 camera with heat sink for the XIAO ESP32S3 Sense. Check the module and firmware requirements before upgrading.",
+    "category": "Cameras / Computer Vision",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "XIAO",
+      "camera"
+    ],
+    "image": "/newsroom/hardware/images/xiao-ov5640.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/OV5640-Camera-for-XIAO-ESP32S3-Sense-With-Heat-Sink-p-5739.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-114993115-ov5640-camera-for-xiao-esp32s3-sense-_with-heat-sink_-45font.jpg"
+  },
+  {
+    "id": "grove-ir-gesture",
+    "name": "Grove Smart IR Gesture Sensor",
+    "manufacturer": "Seeed Studio",
+    "description": "A Grove infrared gesture-sensing module for adding touch-free input to compatible electronics projects.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Grove",
+      "sensors",
+      "gesture"
+    ],
+    "image": "/newsroom/hardware/images/grove-ir-gesture.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Grove-Smart-IR-Gesture-Sensor-p-5721.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-101991067-grove---smart-ir-gesture-sensor-45font.jpg"
+  },
+  {
+    "id": "xiao-nrf54lm20a",
+    "name": "XIAO nRF54LM20A",
+    "manufacturer": "Seeed Studio",
+    "description": "A compact Nordic nRF54LM20A development board for wireless embedded projects. Review current SDK and board support on Seeed.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Nordic",
+      "wireless",
+      "XIAO"
+    ],
+    "image": "/newsroom/hardware/images/xiao-nrf54lm20a.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Seeed-Studio-XIAO-nRF54LM20A-p-6841.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-100023651-seeed-studio-xiao-nrf54lm20.jpg"
+  },
+  {
+    "id": "xiao-nrf54lm20a-sense",
+    "name": "XIAO nRF54LM20A Sense",
+    "manufacturer": "Seeed Studio",
+    "description": "The Sense variant of the XIAO nRF54LM20A platform for wireless sensing projects. Check the listed onboard sensors and SDK requirements.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "Nordic",
+      "sensors",
+      "XIAO"
+    ],
+    "image": "/newsroom/hardware/images/xiao-nrf54lm20a-sense.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Seeed-Studio-XIAO-nRF54LM20A-Sense-p-6840.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/2/0/20260707-151715.jpg"
+  },
+  {
+    "id": "xiao-display-nrf52840",
+    "name": "0.96-inch Display with XIAO nRF52840 Plus",
+    "manufacturer": "Seeed Studio",
+    "description": "A small display platform powered by XIAO nRF52840 Plus for compact embedded interfaces. Review the included hardware on Seeed.",
+    "category": "Accessories",
+    "tags": [
+      "Arduino / Microcontrollers",
+      "XIAO",
+      "display"
+    ],
+    "image": "/newsroom/hardware/images/xiao-display-nrf52840.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/0-96-Inch-Display-Powered-by-XIAO-nRF52840-Plus-p-6992.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/0/100063377-gallery_img_1_1.jpg"
+  },
+  {
+    "id": "sound-detection-d1",
+    "name": "Sound Event Detection Module D1",
+    "manufacturer": "Seeed Studio",
+    "description": "A dedicated sound-event detection module for adding audio-triggered behavior to compatible projects. See the supported events and integration requirements.",
+    "category": "Arduino / Microcontrollers",
+    "tags": [
+      "sensors",
+      "audio"
+    ],
+    "image": "/newsroom/hardware/images/sound-detection-d1.jpg",
+    "supplier": "seeed",
+    "seeedUrl": "https://www.seeedstudio.com/Sound-Event-Detection-Module-D1-p-6652.html",
+    "featured": false,
+    "active": true,
+    "createdAt": "2026-09-22",
+    "updatedAt": "2026-09-22",
+    "sourceVerifiedAt": "2026-09-22",
+    "imageSource": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-sound-event-dectection-module_1.jpg"
   }
 ]
