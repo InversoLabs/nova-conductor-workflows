@@ -21,12 +21,13 @@ def respond(environ, start_response, body, content_type, status='200 OK'):
 
 def app(environ, start_response):
     path = environ.get('PATH_INFO', '/')
-    if path == '/newsroom' or path.startswith('/newsroom/'):
+    section = next((name for name in ('newsroom','fakenews') if path == '/'+name or path.startswith('/'+name+'/')), None)
+    if section:
         if environ['REQUEST_METHOD'] not in {'GET', 'HEAD'}:
             return respond(environ, start_response, b'Method not allowed', 'text/plain', '405 Method Not Allowed')
-        relative = path[len('/newsroom/'): ] if path.startswith('/newsroom/') else ''
+        relative = path[len('/'+section+'/'): ] if path.startswith('/'+section+'/') else ''
         relative = relative or 'index.html'
-        folder = (ROOT / 'newsroom' / 'public').resolve()
+        folder = (ROOT / section / 'public').resolve()
         target = (folder / relative).resolve()
         if target.is_dir(): target = target / 'index.html'
         if folder not in target.parents or not target.is_file() or target.suffix not in {'.html','.css','.js','.json','.svg','.xml','.jpg','.mp4'}:

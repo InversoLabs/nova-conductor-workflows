@@ -59,7 +59,8 @@ state and do not blindly repost uncertain Instagram submissions.
 - Outfit order: navy blazer, burgundy dress, gray blazer, original charcoal;
   repeats per edition. The choice and image hash are saved in the bulletin.
   Both formats and retries keep the same outfit.
-- Wardrobe source images, hashes and approvals: `newsroom/anchor/wardrobe.json`.
+- Wardrobe source images, hashes and approvals: 
+ewsroom/anchor/wardrobe.json`.
 
 ## Evidence already completed
 
@@ -79,7 +80,8 @@ state and do not blindly repost uncertain Instagram submissions.
 
 ## Editorial repair update
 
-`newsroom/editorial-policy.mjs` updates the saved library, schedule template and
+
+ewsroom/editorial-policy.mjs` updates the saved library, schedule template and
 current project: editor reads complete UTF-8 evidence, searches before declaring
 names unsupported, and uses REVISE for fixable copy. Its opt-in
 `blockedRepairLimit: 2` sends a BLOCKED result to the existing revision role for
@@ -117,7 +119,8 @@ the laptop's port 18181 is a different installation, with its schedule disabled.
 
 - Do not delete delivery records, reset seen IDs, or re-enable a second publisher.
   Up to three automatic attempts are made before attention is required.
-- For a stale GPU reservation use `node newsroom/anchor/recover.mjs` only after
+- For a stale GPU reservation use 
+ode newsroom/anchor/recover.mjs` only after
   inspecting the owner. It refuses a live owner/inference process and restores
   recorded models before releasing the hold. Failed restoration retains the lease.
 - Instagram token refresh is not automatic. Reconnect through Social team before
@@ -144,12 +147,23 @@ DPAPI credentials are user/machine-bound and may require reconnection on a new
 host. Restoring source must not overwrite the current queue or schedule state.
 
 See [server operations](SERVER.md), [anchor setup and recovery](newsroom/anchor/README.md),
-and [Instagram setup and recovery](newsroom/social/README.md). Run `npm test`,
+and [Instagram setup and recovery](newsroom/social/README.md). Run 
+pm test`,
 `python website/test_video.py`, and `python newsroom/scripts/test_publish.py`
 after relevant changes. Live model/Instagram acceptance is separate from unit tests.
 
 ## Hardware storefront — September 22
 
 Live at https://inversolabs.us/newsroom/hardware/. One navigation link beside Open source; no homepage product sections or article recommendations, per the updated user scope. Eight verified Seeed listings include DGX Spark (explicitly marked discontinued/out of stock at verification) and Jetson AGX Thor. Catalog/config and maintenance/deployment instructions: newsroom/HARDWARE.md. Static files deployed to website public and server Conductor source without service restarts. Desktop/mobile rendering, search/category filtering and tracking URLs verified live; npm test: 90 passed, 3 skipped, 0 failed. The repaired news edition advanced to SOCIAL_WRITER during this work and its article appeared on the public front page. Final social/anchor completion remains to be checked; do not duplicate the running workflow.
-`nHardware expansion: 32 active products; DGX Spark removed. All hardware is the default catalog view. Added the requested rotating product card under the front-page right-column newsroom note. Live card controls, affiliate URLs, product count and Raspberry Pi filter verified. Focused hardware tests pass. No service restarts or workflow changes.
-`nSocial caption fix: card robot now appends a missing canonical article URL to SOCIAL_READY.json before editor review; wrong links and oversized captions still fail. Writer draft is preserved. Server social files, saved NEWSROOM template, schedules and current stopped workflow updated with backups. Current card rendered successfully without model/GPU use. Current project remains NEEDS_ATTENTION at SOCIAL_CARD; resume after anchor rendering finishes so normal SOCIAL_EDITOR approval precedes publishing. No approval bypass or automatic duplicate publish.
+
+Hardware expansion: 32 active products; DGX Spark removed. All hardware is the default catalog view. Added the requested rotating product card under the front-page right-column newsroom note. Live card controls, affiliate URLs, product count and Raspberry Pi filter verified. Focused hardware tests pass. No service restarts or workflow changes.
+
+Social caption fix: card robot now appends a missing canonical article URL to SOCIAL_READY.json before editor review; wrong links and oversized captions still fail. Writer draft is preserved. Server social files, saved NEWSROOM template, schedules and current stopped workflow updated with backups. Current card rendered successfully without model/GPU use. Current project remains NEEDS_ATTENTION at SOCIAL_CARD; resume after anchor rendering finishes so normal SOCIAL_EDITOR approval precedes publishing. No approval bypass or automatic duplicate publish.
+
+## The Artificial News — September 22 pilot
+
+New satire publication at https://inversolabs.us/fakenews/, Instagram handle @theartificialnews. Source is fakenews/; template ID remains FAKENEWS and watcher task remains Fake News Network Anchor to preserve state across renaming. See fakenews/README.md.
+
+The original IN / SIGNAL September 22 newsroom/social edition reached COMPLETE and its anchor video finished. Its schedule remains 06:00/15:00 Central. The new comedy schedule is saved for 10:00/20:00 Central but disabled until the live pilot passes.
+
+Pilot project b4dad28cd9a1822f9fa9 is in C:\Users\justi\Documents\Nova Conductor Workflow Projects\Fake News Network edition-1790118992099. Initial writer patches/PowerShell quoting failed; the revised writer returns JSON, a SAVE robot validates and writes it, and the editor still gates publication. Reopened at WRITER (run 0005); full live acceptance is pending. Website/card/intro plumbing is deployed; Instagram remains disconnected pending separate credentials for the new account. Do not claim video publication until the new anchor queue reports complete and public exports are verified.

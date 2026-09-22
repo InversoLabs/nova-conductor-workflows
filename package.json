@@ -17,6 +17,7 @@
     "ui",
     "STUDIO.md",
     "newsroom",
+    "fakenews",
     "SERVER.md"
   ],
   "scripts": {
