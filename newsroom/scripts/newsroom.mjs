@@ -37,7 +37,7 @@ export function validateStory(s,sources){
   const words=text.toLowerCase().match(/[a-z0-9]+/g)||[];for(const source of sources){const original=(source.excerpt||'').toLowerCase().replace(/[^a-z0-9]+/g,' ');for(let i=0;i+18<=words.length;i++)if(original.includes(words.slice(i,i+18).join(' ')))throw Error('Story copies a long source passage; rewrite it in original language');}
   return {...s,id:idFor(s.sources[0].url),sources:s.sources.map(x=>({name:sources.find(a=>a.url===x.url).name,url:x.url})),format:'BRIEFING',priority:0,publishedAt:new Date().toISOString(),imageAlt:'Abstract '+s.category.toLowerCase()+' editorial illustration',disclosure:'AI-assisted reporting by Nova Conductor. Based on linked primary sources; company claims are not independent test results. Original procedural illustration, not a photograph.'};
 }
-export function illustration(s){
+export function illustration(s, fallback = null){
   const seed=parseInt(s.id.slice(0,6),16),h=seed%100+140;let shapes='';
   for(let i=0;i<14;i++){const x=100+(i*127+seed)%850,y=80+(i*73+seed)%410;shapes+=`<circle cx="${x}" cy="${y}" r="${20+(i*17)%70}" fill="none" stroke="hsl(${h+i*3},70%,65%)" stroke-opacity=".3"/><path d="M600 320L${x} ${y}" stroke="#a8eaa3" stroke-opacity=".12"/>`;}
   const title=s.title.toLowerCase();let motif='';
@@ -45,6 +45,21 @@ export function illustration(s){
   else if(/fashion|design/.test(title)){for(let j=0;j<13;j++){const x=470+j*18;motif+=`<path d="M${x} 130 Q${600+(j-6)*25} 270 ${450+j*24} 500 Q600 560 ${750-j*24} 500 Q${600-(j-6)*25} 270 ${730-j*18} 130" fill="none" stroke="hsl(${280+j*5},65%,70%)" stroke-width="2"/>`;}motif+='<circle cx="600" cy="105" r="34" fill="none" stroke="#dfcafa" stroke-width="2"/>';}
   else if(/econom|data|global/.test(title)){motif='<circle cx="610" cy="315" r="190" fill="#aee77e" fill-opacity=".03" stroke="#b2ef96" stroke-width="2"/>';for(let i=-3;i<=3;i++){motif+=`<ellipse cx="610" cy="315" rx="${50+Math.abs(i)*45}" ry="190" fill="none" stroke="#8ae0b0" stroke-opacity=".45"/><ellipse cx="610" cy="${315+i*43}" rx="${Math.sqrt(190*190-i*i*43*43)}" ry="28" fill="none" stroke="#8ae0b0" stroke-opacity=".3"/>`;}motif+='<path d="M260 420L390 350L470 385L590 230L700 270L850 145" fill="none" stroke="#d8ff36" stroke-width="6"/>';}
   else if(/standard|safety|review/.test(title)){for(let i=0;i<9;i++){const x=390+i%3*145,y=120+Math.floor(i/3)*145;motif+=`<rect x="${x}" y="${y}" width="115" height="115" rx="15" fill="#a3e2cb" fill-opacity=".07" stroke="#95d6bd"/><path d="M${x+25} ${y+58}l20 20 45-45" fill="none" stroke="#d8ff36" stroke-width="5"/>`;}}
+  else if((fallback ?? seed%3)===1){
+    // Layered token tiles: a distinct visual for the general AI fallback pool.
+    for(let row=0;row<3;row++)for(let col=0;col<5;col++){
+      const x=235+col*150+row*22,y=165+row*115;
+      motif+=`<rect x="${x}" y="${y}" width="125" height="82" rx="14" fill="hsl(${h+row*25},45%,25%)" stroke="#a6dfef" stroke-width="2"/><path d="M${x+22} ${y+30}h65 M${x+22} ${y+48}h40" stroke="#d8ff36" stroke-width="5"/>`;
+    }
+    motif='<g data-fallback="tokens">'+motif+'</g>';
+  }
+  else if((fallback ?? seed%3)===2){
+    // Neural constellation: three connected layers, rather than another chip.
+    const nodes=[];for(let layer=0;layer<3;layer++)for(let row=0;row<4;row++)nodes.push([330+layer*270,155+row*105,layer]);
+    for(const [x,y,l] of nodes)for(const [nx,ny,nl] of nodes)if(nl===l+1)motif+=`<path d="M${x} ${y}L${nx} ${ny}" stroke="#76c9da" stroke-opacity=".5" stroke-width="2"/>`;
+    for(const [x,y,l] of nodes)motif+=`<circle cx="${x}" cy="${y}" r="27" fill="hsl(${h+l*30},50%,28%)" stroke="#d8ff36" stroke-width="3"/><circle cx="${x}" cy="${y}" r="7" fill="#e3f9c7"/>`;
+    motif='<g data-fallback="network">'+motif+'</g>';
+  }
   else {motif='<rect x="440" y="155" width="320" height="320" rx="24" fill="#adc9ff" fill-opacity=".06" stroke="#a1c9f4" stroke-width="3"/><rect x="485" y="200" width="230" height="230" rx="10" fill="#759eff" fill-opacity=".12" stroke="#b3d5fc"/>';for(let i=0;i<8;i++){const a=465+i*38;motif+=`<path d="M${a} 90V150 M${a} 480V555 M375 ${180+i*38}H435 M765 ${180+i*38}H835" stroke="#a1c9f4" stroke-width="4"/>`;}motif+='<text x="533" y="340" font-family="monospace" font-size="85" fill="#d8ff36">AI</text>';}
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750"><defs><radialGradient id="g"><stop stop-color="hsl(${h},35%,27%)"/><stop offset="1" stop-color="#0d1b1b"/></radialGradient><pattern id="p" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#b5dfac" stroke-opacity=".07"/></pattern></defs><rect width="1200" height="750" fill="url(#g)"/><rect width="1200" height="750" fill="url(#p)"/>${shapes}${motif}<text x="60" y="65" fill="#d8ff36" font-family="monospace" font-size="18" letter-spacing="4">IN / SIGNAL — ${esc(s.category.toUpperCase())}</text><text x="60" y="665" fill="#dce6d9" font-family="Arial,sans-serif" font-size="30">${esc(s.title.slice(0,65))}</text><text x="60" y="706" fill="#879d91" font-family="monospace" font-size="13" letter-spacing="3">EDITORIAL ILLUSTRATION / INVERSO LABS</text></svg>`;
 }
