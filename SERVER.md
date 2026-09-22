@@ -8,7 +8,7 @@ The newsroom now runs on NOVA-SERVER under the Windows account `justi`, independ
 - Projects and run evidence: `C:\Users\justi\Documents\Nova Conductor Workflow Projects`
 - Settings and schedules: `C:\Users\justi\AppData\Local\NovaConductor`
 - Workflow library: `C:\Users\justi\AppData\Local\Nova-Conductor\library\templates\NEWSROOM.json`
-- Service logs: `C:\Users\justi\AppData\Local\NovaConductor\server`
+- Service logs: `C:\Users\justi\AppData\Local\NovaConductor\server-18183`
 - Website: `C:\Users\justi\Documents\inversolabs-homepage\newsroom`
 
 ## Runtime and schedule
@@ -39,3 +39,7 @@ To roll back hosting, first disable the server's newsroom schedule and stop any 
 A normal server collection run held publication because no fresh, unpublished source remained. A separate bounded migration project reuses a previously published source to exercise native writer and editor sessions plus validation and local publishing. The publisher's existing source ID is idempotent, so this test must neither create a duplicate nor replace an article. See the migration project's state.json, runs, and work/PUBLISHED.json for the result.
 
 The verified configuration uses Codex's unelevated Windows sandbox, retaining workspace restrictions and default private-desktop isolation. On this older Windows 10 18363 host, sandboxed PowerShell failed to initialize under a non-interactive S4U task, even with modern PowerShell. The elevated sandbox runner also failed in that context. The interactive user task passes the shell probe. Supported elevated setup was evaluated, but its sandbox accounts are not used by the final fallback configuration. Do not disable filesystem sandboxing to work around shell startup failures. After a server reboot, sign in as justi to resume the task.
+
+Nova Desktop's bridge must be running on the server. Its current GUI build requires Start Bridge after reopening; Conductor does not silently change the selected provider or start an unauthenticated replacement. After reboot, sign in and start the bridge before expecting model work to succeed.
+
+Migration verified on 2026-09-21: native WRITER → CHECK → EDITOR APPROVE → PUBLISH completed on NOVA-SERVER. The reused source was recognized as already published and public article/image verification passed. Controller stop/restart released and reacquired its port. The server schedule is enabled at 08:00 and 17:00 America/Los_Angeles; the laptop schedule remains disabled. Run-Server uses the existing process guardian so its owned controller tree exits when the task ends.
