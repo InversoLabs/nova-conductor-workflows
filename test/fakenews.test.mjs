@@ -27,7 +27,10 @@ test('draft robot validates model JSON without executing it or accepting ambiguo
 });
 test('TAN bulletin narrates one approved satire summary and identifies itself',()=>{
  const s=validateStory(draft,[source]),b=makeBulletin([s],s);
- assert.equal(b.stories.length,1);assert.match(b.segments[0].text,/The Artificial News/);assert.match(b.segments[0].text,/satire/);
+ assert.equal(b.stories.length,1);assert.match(b.segments[0].text,/The Artificial News/);
+ assert.equal(b.segments[1].text,s.summary);
+ assert.ok(b.segments.every(segment=>segment.text!==s.factualSummary));
+ assert.doesNotMatch(b.segments[0].text+' '+b.segments.at(-1).text,/satire|real source|fictional/i);
  const voice={segments:b.segments.map((x,i)=>({...x,start:i*10,end:(i+1)*10})),duration:b.segments.length*10};
  verifyNarration(b,voice);voice.segments[1].text+=' unreviewed change';assert.throws(()=>verifyNarration(b,voice));
 });

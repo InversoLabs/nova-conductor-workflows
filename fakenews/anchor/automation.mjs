@@ -28,9 +28,9 @@ export function makeBulletin(all,trigger,now=new Date(),editionIndex=0){
   for(const s of selected)if(!/^[a-f0-9]{20}$/.test(s.id)||typeof s.summary!=='string'||s.summary.length<40||s.summary.length>700||!s.sources?.length||s.sources.some(x=>!x.url?.startsWith('https://')))throw Error('Published briefing lacks usable narration or sources');
   const editionDate=new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',month:'long',day:'numeric',year:'numeric'}).format(now);
   return {id:'edition-'+trigger.id,editionDate,createdAt:now.toISOString(),kind:'scheduled',presenter:selectPresenter(editionIndex),stories:selected,headlines:latestHeadlines(all).map(s=>s.title),segments:[
-    {title:'The Daily Nonsense | '+editionDate,text:"This is The Artificial News. I'm Mara Vale. Real headlines, deeply unserious reporting. This bulletin is satire."},
+    {title:'The Daily Nonsense | '+editionDate,text:"I'm Mara Vale with The Artificial News. Let's see what the humans have done now."},
     ...selected.map(s=>({title:s.title,storyId:s.id,text:s.summary})),
-    {title:'Read more at inversolabs.us/fakenews',text:'Read the real source and our fictional nonsense at Inverso Labs dot U S slash fake news.'}
+    {title:'The Artificial News',text:"That's all from The Artificial News. Humans remain under observation."}
   ]};
 }
 export function verifyNarration(b,voice){
