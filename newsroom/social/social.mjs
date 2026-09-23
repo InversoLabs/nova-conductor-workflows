@@ -44,9 +44,14 @@ export function validateCaption(draft,story){
 export function completeCaption(draft,story){
   if(typeof draft?.caption!=='string')return validateCaption(draft,story);
   const caption=draft.caption.trim();
-  // Only fill a missing link. Never replace or approve an unexpected destination.
+  // Repair a known source link; never rewrite an unknown destination.
   const urls=caption.match(/https?:\/\/[^\s]+/g)||[];
-  if(urls.length)return validateCaption(draft,story);
+  if(urls.length){
+    const sources=new Set((story.sources||[]).map(source=>source.url));
+    if(urls.some(url=>url!==story.url&&!sources.has(url)))return validateCaption(draft,story);
+    const repaired=caption.replace(/https?:\/\/[^\s]+/g,url=>sources.has(url)?story.url:url);
+    return validateCaption({...draft,caption:repaired},story);
+  }
   validateCaption({...draft,caption:caption+'\n\n'+story.url},story);
   return caption+'\n\n'+story.url;
 }

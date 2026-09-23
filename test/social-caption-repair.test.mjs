@@ -15,3 +15,14 @@ test('repair does not bypass unexpected links, placeholders or caption limit',()
   assert.throws(()=>completeCaption({caption:'TODO replace this caption with a real story'},story),/Placeholder/);
   assert.throws(()=>completeCaption({},story));
 });
+
+test('verified source URL is replaced before review, but lookalikes are rejected',()=>{
+  const source='https://huggingface.co/blog/omlx';
+  const published={...story,sources:[{name:'Hugging Face',url:source}]};
+  const caption='A sourced briefing about local AI development. Read more: '+source;
+  const repaired=completeCaption({caption},published);
+  assert.equal(repaired,caption.replace(source,story.url));
+  assert.equal(completeCaption({caption:repaired},published),repaired);
+  assert.throws(()=>completeCaption({caption:caption+'-unverified'},published));
+  assert.throws(()=>completeCaption({caption:caption+' https://unapproved.example/'},published));
+});
