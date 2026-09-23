@@ -55,7 +55,7 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
     d.text((75, top+8), 'AN', font=font(48, True), fill='white')
     # Original TAN wordmark
     # No second wordmark line
-    d.text((55, top+102), 'MARA VALE', font=font(26, True), fill='white', stroke_width=1, stroke_fill='#181020')
+    # Presenter identity is attached to each timed shot below.
     bottom = 1400 if phone else 840
     ticker_y, ticker_h = (1628, 66) if phone else (988, 62)
     label_w = 178 if phone else 200
@@ -76,6 +76,25 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
     for index, segment in enumerate(timeline):
         title_plate = Image.new('RGBA', (w, h), (0, 0, 0, 0))
         title_draw = ImageDraw.Draw(title_plate)
+        title_draw.text((55, top+102), segment.get('presenter', 'Vera Volt').upper(), font=font(26, True), fill='white', stroke_width=1, stroke_fill='#181020')
+        pip = segment.get('pip')
+        if pip:
+            px, py, pw, ph = (70, 1030, 410, 310) if phone else (1390, 170, 470, 350)
+            inset = Image.new('RGB', (pw, ph), '#24172d')
+            if pip in ('moon', 'dishwasher'):
+                from PIL import ImageOps
+                source = Image.open(Path(__file__).parent/'assets'/('pip-'+pip+'.png')).convert('RGB')
+                inset = ImageOps.fit(source, (pw, ph-44))
+                title_plate.paste(inset, (px, py))
+            else:
+                chart = ImageDraw.Draw(inset)
+                for y in range(40, ph-40, 45): chart.line((20,y,pw-20,y),fill='#483250',width=1)
+                chart.line([(25,ph-70),(110,ph-110),(180,ph-95),(260,110),(350,65),(pw-25,20)],fill='#55f0ba',width=7)
+                chart.text((25,20), '+400% VIBES',font=font(25,True),fill='#55f0ba')
+                title_plate.paste(inset,(px,py))
+            title_draw.rectangle((px,py,px+pw,py+ph),outline='#b57bdd',width=3)
+            title_draw.rectangle((px,py+ph-44,px+pw,py+ph),fill='#24172d')
+            title_draw.text((px+15,py+ph-34), {'chart':'DOWNSIDE REMOVED','moon':'AD SPACE','dishwasher':'LOADING DISPUTE'}[pip],font=font(22,True),fill='white')
         title = unicodedata.normalize('NFKC', segment['title']).replace('\u2010', '-').replace('\u2011', '-')
         for size in range(48 if phone else 54, 25, -1):
             title_font = font(size, True)
@@ -119,8 +138,14 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
                         f'fade=t=out:st={segment["end"]-fade}:d={fade}:alpha=1[title{index}];'
                         f'[{panel}][title{index}]overlay=0:0:shortest=1[p{index}];')
         panel = f'p{index}'
-    graph = (f'[0:v]scale={w}:{h}:force_original_aspect_ratio=increase,'
-             f'crop={w}:{h},setsar=1[base];[base][1:v]overlay=0:0:format=auto[panel];'+title_graph+
+    if phone:
+        base_graph = f'[0:v]scale=-2:1240,crop={w}:1240,pad={w}:{h}:0:120:color=0x17101e,setsar=1[base];'
+    else:
+        full_ranges = '+'.join("between(t,%s,%s)" % (seg['start'],seg['end']) for seg in timeline if seg.get('shot')=='full') or '0'
+        base_graph = (f'[0:v]split=2[normal][wide];[normal]scale={w}:{h},setsar=1[normalbase];'
+                      f'[wide]scale=-2:780,pad={w}:{h}:(ow-iw)/2:30:color=0x17101e,setsar=1[widebase];'
+                      f"[normalbase][widebase]overlay=0:0:enable='{full_ranges}'[base];")
+    graph = (base_graph+'[base][1:v]overlay=0:0:format=auto[panel];'+title_graph+
              f'[2:v]crop={w-label_w}:{ticker_h}:x=mod(t*{ticker_speed:.3f}\\,{period}):y=0[scroll];'
              f'[{panel}][scroll]overlay={label_w}:{ticker_y}:shortest=1,format=yuv420p[v]')
     title_inputs = [arg for title_file in title_files for arg in ['-loop', '1', '-framerate', '25', '-i', str(title_file)]]

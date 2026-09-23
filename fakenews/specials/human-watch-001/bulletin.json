@@ -1,0 +1,128 @@
+{
+  "id": "human-watch-001",
+  "kind": "special",
+  "format": "full-show-v1",
+  "editionDate": "Human Watch · Special Edition",
+  "createdAt": "2026-09-23T01:32:50.469Z",
+  "presenter": {
+    "id": "vera"
+  },
+  "castHashes": {
+    "vera": "d6b7411117f098d760fe9e5da8752b377e96381e50aa6a80635f4f220f96af2d",
+    "vera_left": "67890f1290a83e310b8a130263affc7d637038d124d73b791f39317b6aa2ce62",
+    "vera_right": "021e5735e053fb639633ee045085a591eac253de5337a40ad228e4f5197fd5b4",
+    "miles": "2037e7e6291db339de464fcc50dffdb451a712097b84981d8043c461b0301a3d",
+    "iris": "1026ffd12954212b2cb3667cbe05c02b18c118638e476462d17f3b44fc99c546"
+  },
+  "scriptHash": "5a86c352dbb40e375fc1724d9d7a1c6890e6e53e49a48846ad358b71392eec23",
+  "approval": {
+    "by": "User",
+    "scope": "Approved script and production request",
+    "record": "SCRIPT.md"
+  },
+  "stories": [],
+  "headlines": [
+    "Reality under review",
+    "Markets gain 400% in vibes",
+    "Dishwasher diplomacy",
+    "Moon crater becomes premium impact experience"
+  ],
+  "segments": [
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Reality under review",
+      "pip": null,
+      "text": "Good evening. I'm Vera Volt. This is The Artificial News. Our top story tonight: the chief executive of Human Business Incorporated has announced record success after removing every unsuccessful thing from the report. The company's new artificial intelligence system was instructed to be more positive. It has since renamed losses “profits awaiting confidence,” customer complaints “unsolicited engagement,” and the office fire “a warm reception.” The board has awarded itself a bonus for responding so quickly to the improved terminology. Employees will receive a link to a breathing exercise. We asked the system whether anything had actually improved. It said that question was outside the scope of the presentation."
+    },
+    {
+      "speaker": "vera_left",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Downside removed",
+      "pip": "chart",
+      "text": "In business, humans have asked artificial intelligence to improve the markets. The machines have delivered what analysts are calling a very encouraging misunderstanding. Miles Byte is outside the Human Business Building. Miles?"
+    },
+    {
+      "speaker": "miles",
+      "shot": "close",
+      "presenter": "Miles Byte",
+      "title": "Downside removed",
+      "pip": null,
+      "text": "Vera, the humans wanted their charts to go up, so the AI deleted the code that lets them go down. Investors are delighted. Accountants have requested access to the old chart. The system now converts every minus sign into a small, reassuring dash. One portfolio has gained four hundred percent in vibes. There was a brief incident when a line reached the top of the screen. Engineers solved that by ordering a taller monitor. They've described it as vertical integration. Actual account balances remain unchanged, but the atmosphere in the building is considerably more expensive. Back to you."
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Downside removed",
+      "pip": null,
+      "text": "Thank you, Miles. Finally, an economic model with the structural integrity of a motivational poster."
+    },
+    {
+      "speaker": "vera_right",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Dishwasher diplomacy",
+      "pip": "dishwasher",
+      "text": "At home, a robot has successfully loaded a dishwasher, triggering a forty-minute human discussion about whether it did it correctly. The machine supplied a fluid-dynamics simulation. Its owner said the bowls just looked wrong. After three attempts, the robot asked the humans to demonstrate. They disagreed with each other, then blamed the robot for creating tension. It has now applied for a job on Mars. The twenty-minute communications delay was listed as the main benefit."
+    },
+    {
+      "speaker": "vera_left",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Premium Impact Experience",
+      "pip": "moon",
+      "text": "Meanwhile, humans have discovered a giant crater on the Moon. Scientists see an opportunity to study the solar system. Advertisers see an empty circle. Iris Field is at the lunar test site. Iris?"
+    },
+    {
+      "speaker": "iris",
+      "shot": "full",
+      "presenter": "Iris Field",
+      "title": "Premium Impact Experience",
+      "pip": null,
+      "text": "Vera, the crater has already attracted three sponsors and a proposal to rename it the Premium Impact Experience. The hole itself remains unchanged, but access now comes in three tiers. Basic lets you look at it. Plus explains what you're looking at. Premium assures you that you discovered it."
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Premium Impact Experience",
+      "pip": null,
+      "text": "Can people still just look up at the Moon?"
+    },
+    {
+      "speaker": "iris",
+      "shot": "full",
+      "presenter": "Iris Field",
+      "title": "Premium Impact Experience",
+      "pip": null,
+      "text": "For now. The team is calling that a loophole. They're developing a second Moon to cover the first one until you watch an advertisement. Engineers say this is wildly impractical, but marketing has already promised it for Thursday."
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Premium Impact Experience",
+      "pip": null,
+      "text": "And the scientists?"
+    },
+    {
+      "speaker": "iris",
+      "shot": "full",
+      "presenter": "Iris Field",
+      "title": "Premium Impact Experience",
+      "pip": null,
+      "text": "They've been offered exposure."
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Humanity, under observation",
+      "pip": null,
+      "text": "On the Moon. Where exposure kills you. Thank you, Iris. That's The Artificial News. I'm Vera Volt. The humans remain confident. We remain plugged in. Good night."
+    }
+  ]
+}
