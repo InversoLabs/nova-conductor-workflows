@@ -28,7 +28,7 @@ for name,w,h in [('website',1920,1080),('instagram',1080,1920)]:
   # Restrained light sweep and horizontal broadcast rules.
   sy=int(h*(.15+(t/3)*.7));d.line((0,sy,w,sy),fill='#2d4353',width=2)
   title=Image.new('RGBA',(w,h));td=ImageDraw.Draw(title)
-  for text,dy,size,color in [('AN',-270,110,'#42DFD1'),('THE ARTIFICIAL',-105,120 if w>1200 else 90,'#FFFFFF'),('NEWS',35,140 if w>1200 else 110,'#FFFFFF')]:
+  for text,dy,size,color in [('THE ARTIFICIAL',-105,120 if w>1200 else 90,'#FFFFFF'),('NEWS',35,140 if w>1200 else 110,'#FFFFFF')]:
    f=font(size);tw=td.textlength(text,font=f);td.text(((w-tw)/2,cy+dy),text,font=f,fill=color,stroke_width=2,stroke_fill='#21152f')
   reveal=min(1,max(0,(t-.25)/.75));title.putalpha(title.getchannel('A').point(lambda x:int(x*reveal)))
   im.paste(title,(0,0),title)
