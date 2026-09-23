@@ -6,6 +6,6 @@ export class InstagramReels extends Instagram {
   create(caption,videoUrl){
     const url=new URL(videoUrl);
     if(url.protocol!=='https:')throw Error('Reels require a public HTTPS video URL');
-    return this.request(this.accountId+'/media',{media_type:'REELS',video_url:url.href,caption,share_to_feed:'true'},'POST');
+    return this.request(this.accountId+'/media',{media_type:'REELS',video_url:url.href,caption,share_to_feed:'true',thumb_offset:'1000'},'POST');
   }
 }

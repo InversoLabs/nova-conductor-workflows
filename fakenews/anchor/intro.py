@@ -1,8 +1,13 @@
 """Three-second animated AN ident; original procedural globe and title motion."""
-import argparse, math, subprocess, os
+import argparse, math, subprocess, os, json
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 p=argparse.ArgumentParser();p.add_argument('--ffmpeg',required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+timeline=json.loads((a.output/'voice.json').read_text(encoding='utf-8-sig'))['segments']
+# Open on the presenter's complete greeting, then the ident, then the stories.
+# Split at a frame boundary without repeating or dropping narration.
+opening=round(float(timeline[0]['end'])*25)/25
+if not 0 < opening < float(timeline[-1]['end']):raise ValueError('A complete opening greeting and following story are required')
 def font(size):return ImageFont.truetype('C:/Windows/Fonts/arialbd.ttf',size)
 for name,w,h in [('website',1920,1080),('instagram',1080,1920)]:
  intro=a.output/(name+'-intro.mp4');body=a.output/(name+'-body.mp4');out=a.output/(name+'.mp4')
@@ -40,5 +45,10 @@ for name,w,h in [('website',1920,1080),('instagram',1080,1920)]:
  proc.stdin.close()
  if proc.wait()!=0:raise RuntimeError('Intro encoding failed')
  os.replace(out,body)
- subprocess.run([a.ffmpeg,'-v','error','-y','-i',str(intro),'-i',str(body),'-filter_complex','[0:v]setsar=1[v0];[1:v]setsar=1[v1];[v0][0:a][v1][1:a]concat=n=2:v=1:a=1[v][a]','-map','[v]','-map','[a]','-c:v','libx264','-preset','fast','-crf','20','-c:a','aac','-movflags','+faststart',str(out)],check=True)
+ graph=(f'[1:v]split[head][tail];[head]trim=end={opening},setpts=PTS-STARTPTS,setsar=1[hv];'
+        f'[tail]trim=start={opening},setpts=PTS-STARTPTS,setsar=1[tv];'
+        f'[1:a]asplit[ha0][ta0];[ha0]atrim=end={opening},asetpts=PTS-STARTPTS[ha];'
+        f'[ta0]atrim=start={opening},asetpts=PTS-STARTPTS[ta];'
+        '[0:v]setsar=1[iv];[hv][ha][iv][0:a][tv][ta]concat=n=3:v=1:a=1[v][a]')
+ subprocess.run([a.ffmpeg,'-v','error','-y','-i',str(intro),'-i',str(body),'-filter_complex',graph,'-map','[v]','-map','[a]','-c:v','libx264','-preset','fast','-crf','20','-c:a','aac','-movflags','+faststart',str(out)],check=True)
  subprocess.run([a.ffmpeg,'-v','error','-xerror','-i',str(out),'-f','null','-'],check=True)
