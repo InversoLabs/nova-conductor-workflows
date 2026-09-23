@@ -15,7 +15,13 @@ export class Instagram {
       if(method==='GET'&&(response.status===429||response.status>=500)&&attempt<2){await this.sleep(1000*2**attempt);continue;}break;
     }
     let body;try{body=await response.json();}catch{throw Error('Instagram returned an unreadable response; inspect delivery status');}
-    if(!response.ok||body.error)throw Error(`Instagram HTTP ${response.status} (code ${Number(body.error?.code)||0}). Check connection, permissions, or rate limits.`);
+    if(!response.ok||body.error){
+      if(Number(body.error?.code)===200&&/^API access blocked\.?$/i.test(String(body.error?.message||'').trim())){
+        const error=Error('Meta has blocked Instagram API access. Check the Meta app dashboard and account access before retrying; the approved post is retained.');
+        error.code='INSTAGRAM_ACCESS_BLOCKED';throw error;
+      }
+      throw Error(`Instagram HTTP ${response.status} (code ${Number(body.error?.code)||0}). Check connection, permissions, or rate limits.`);
+    }
     return body;
   }
   identity(){return this.request(this.accountId,{fields:'id,user_id,username'});}

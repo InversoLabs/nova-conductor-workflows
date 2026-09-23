@@ -105,7 +105,7 @@ export async function publishPost(id,{automatic=false}={}){
     post.accountId=c.accountId;atomic(postPath,post);
     const client=new Instagram({...c,token:await storedKey('NOVA_INSTAGRAM_TOKEN')});
     return await deliver({client,record:post,caption:post.caption,imageUrl,save:p=>atomic(postPath,p)});
-  }catch(e){try{const p=path.join(folder,'post.json'),record=read(p);record.lastError=e.message;atomic(p,record);}catch{}throw e;}
+  }catch(e){try{const p=path.join(folder,'post.json'),record=read(p);record.lastError=e.message;if(e.code==='INSTAGRAM_ACCESS_BLOCKED'){record.autoRetry=false;record.blockedReason=e.code;record.blockedAt=new Date().toISOString();}atomic(p,record);}catch{}throw e;}
   finally{fs.closeSync(fd);fs.unlinkSync(lock);}
 }
 export function createSocialPump(){
