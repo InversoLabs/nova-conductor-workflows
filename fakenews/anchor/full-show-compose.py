@@ -65,7 +65,7 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
     d.text((59, bottom-34), a.label, font=font(24, True), fill='#181020')
     d.rectangle((0, bottom, w, ticker_y-10), fill='#F0EBFA')
     d.rectangle((0, bottom, 12, ticker_y-10), fill=lime)
-    headline_font = font(48 if phone else 54, True)
+    headline_font = font(62 if phone else 70, True)
     lines = wrapped(d, a.headline, headline_font, w-(170 if phone else 120))
     if len(lines) > (3 if phone else 2):
         raise ValueError('Headline is too long for the broadcast layout')
@@ -81,7 +81,27 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
         if pip:
             px, py, pw, ph = (70, 1030, 410, 310) if phone else (1390, 170, 470, 350)
             inset = Image.new('RGB', (pw, ph), '#24172d')
-            if pip in ('moon', 'dishwasher'):
+            if pip == 'captcha':
+                card=ImageDraw.Draw(inset)
+                stage=segment.get('captchaStage','bicycle')
+                card.rectangle((0,0,pw,60),fill='#285e89')
+                label={'bicycle':'SELECT ALL BICYCLES','traffic':'SELECT TRAFFIC LIGHTS','pending':'HUMAN? PROCESSING...','verified':'VERIFIED HUMAN'}[stage]
+                card.text((15,18),label,font=font(22,True),fill='white')
+                if stage=='verified':
+                    card.line([(pw//2-75,145),(pw//2-20,195),(pw//2+85,95)],fill='#42DFD1',width=13)
+                else:
+                    for cell in range(9):
+                        xx=20+(cell%3)*(pw-40)//3;yy=72+(cell//3)*58
+                        card.rectangle((xx,yy,xx+(pw-46)//3,yy+53),fill='#435567',outline='#b8c0cb',width=1)
+                        if stage=='bicycle':
+                            card.ellipse((xx+12,yy+24,xx+37,yy+48),outline='#42DFD1',width=3)
+                            card.ellipse((xx+66,yy+24,xx+91,yy+48),outline='#42DFD1',width=3)
+                            card.line([(xx+25,yy+36),(xx+49,yy+10),(xx+79,yy+36),(xx+25,yy+36),(xx+40,yy+13)],fill='white',width=2)
+                        else:
+                            card.rectangle((xx+39,yy+3,xx+63,yy+49),fill='#111820')
+                            for k,c in enumerate(['#f35d69','#ffd55c','#42dfb1']):card.ellipse((xx+46,yy+7+k*13,xx+56,yy+17+k*13),fill=c)
+                title_plate.paste(inset,(px,py))
+            elif pip in ('moon', 'dishwasher'):
                 from PIL import ImageOps
                 source = Image.open(Path(__file__).parent/'assets'/('pip-'+pip+'.png')).convert('RGB')
                 inset = ImageOps.fit(source, (pw, ph-44))
@@ -94,9 +114,9 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
                 title_plate.paste(inset,(px,py))
             title_draw.rectangle((px,py,px+pw,py+ph),outline='#b57bdd',width=3)
             title_draw.rectangle((px,py+ph-44,px+pw,py+ph),fill='#24172d')
-            title_draw.text((px+15,py+ph-34), {'chart':'DOWNSIDE REMOVED','moon':'AD SPACE','dishwasher':'LOADING DISPUTE'}[pip],font=font(22,True),fill='white')
+            title_draw.text((px+15,py+ph-34), {'chart':'DOWNSIDE REMOVED','moon':'AD SPACE','dishwasher':'LOADING DISPUTE','captcha':'HUMAN VERIFICATION'}[pip],font=font(22,True),fill='white')
         title = unicodedata.normalize('NFKC', segment['title']).replace('\u2010', '-').replace('\u2011', '-')
-        for size in range(48 if phone else 54, 25, -1):
+        for size in range(62 if phone else 70, 25, -1):
             title_font = font(size, True)
             title_lines = wrapped(title_draw, title, title_font, w-(170 if phone else 120))
             if len(title_lines)*(size+8) <= ticker_y-bottom-38:
@@ -113,7 +133,7 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
     d.text((22, ticker_y+21), 'HEADLINES', font=font(22, True), fill='#181020')
     d.text((42, 1722 if phone else 1059), 'INVERSOLABS.US / FAKENEWS', font=font(22 if phone else 15, True), fill='#AABBB4')
     # Repeat a complete strip so scrolling wraps seamlessly, including on a short list.
-    ticker_font = font(28 if phone else 29, True)
+    ticker_font = font(34, True)
     widths = [int(d.textlength(t, font=ticker_font))+95 for t in headlines]
     period = max(sum(widths), w-label_w)
     ticker_speed = max(105, period/max(timeline[-1]['end']-1, 1)) if timeline else 105
@@ -141,7 +161,7 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
     if phone:
         base_graph = f'[0:v]scale=-2:1240,crop={w}:1240,pad={w}:{h}:0:120:color=0x17101e,setsar=1[base];'
     else:
-        full_ranges = '+'.join("between(t,%s,%s)" % (seg['start'],seg['end']) for seg in timeline if seg.get('shot')=='full') or '0'
+        full_ranges = '+'.join("gte(n,%s)*lt(n,%s)" % (seg.get('frameStart', round(seg['start']*25)),seg.get('frameEnd', round(seg['end']*25))) for seg in timeline if seg.get('shot')=='full') or '0'
         base_graph = (f'[0:v]split=2[normal][wide];[normal]scale={w}:{h},setsar=1[normalbase];'
                       f'[wide]scale=-2:780,pad={w}:{h}:(ow-iw)/2:30:color=0x17101e,setsar=1[widebase];'
                       f"[normalbase][widebase]overlay=0:0:enable='{full_ranges}'[base];")
@@ -171,7 +191,9 @@ for item in outputs:
     info = subprocess.run([a.ffmpeg, '-hide_banner', '-i', item['file']], capture_output=True, text=True).stderr
     match = re.search(r'Duration: (\d+):(\d+):(\d+\.\d+)', info)
     final_duration = int(match[1])*3600+int(match[2])*60+float(match[3]) if match else 0
-    if abs(final_duration-item['duration']-3) > 0.5:
+    production=json.loads((a.output/'bulletin.json').read_text(encoding='utf-8-sig'))
+    expected=float(production['targetDuration']) if production.get('endCard') else item['duration']+3
+    if abs(final_duration-expected) > 0.5:
         raise ValueError('Intro export duration does not match the complete bulletin')
     item['duration'] = final_duration
     item['bytes'] = Path(item['file']).stat().st_size

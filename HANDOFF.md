@@ -200,3 +200,11 @@ Special production STARTED on server with Start-Process Hidden, Node PID10684, o
 - Artificial News intro compositor now opens with the complete first presenter greeting, inserts the 3-second ident, then continues remaining narration. IN SIGNAL already opens on its presenter. Both website and phone layouts covered. Deployed intro.py and shared instagram-reels.mjs to NOVA-SERVER without restarting running workers.
 - Verified short full-HD/vertical fixture renders decode, first frame shows Vera, total fixture duration remains 15.04s; checked shared cover API parameter with a stub request. Existing videos are not retroactively changed.
 - Larger headline fonts and Iris widescreen framing corrections remain pending; this publication uses the user-requested existing phone version.
+
+## CAPTCHA special production (2026-09-23)
+- User approved a roughly 60-second Vera/Miles CAPTCHA comedy special; no new social publication requested yet. Draft, delivery beats and reproducible bulletin live in fakenews/specials/captcha-001/.
+- Preserve deliberate phrase grouping and pauses, natural voices, Vera cold open, SPECIAL REPORT intro, a one-second hold after Verified human, and a brief Special Report end card. deliverySpeed 0.9; no post-hoc audio speed-up. Six distinct custom joke headlines must remain independent of the live feed.
+- Assets are existing Vera/Miles portraits and procedural CAPTCHA insets (bicycle/traffic/pending/verified). Larger full-show lower thirds and ticker. Render blocks before GPU if narration cannot fit a 1–4s end card within 60s.
+- Full render launched on NOVA-SERVER at 20:56Z into AppData/Local/NovaConductor/fakenews-specials/captcha-001. It waits up to three hours for the studio lease/Conductor workers, then renders. Existing IN SIGNAL edition owns the GPU initially. Inspect status.json and render.log; do not claim finished until PREVIEW_READY and independent export check.
+- Silent 15.04s layout fixture passed complete decode at 1920x1080 and 1080x1920; Special Report logo and CAPTCHA phone frame visually inspected. This is not the full voiced render.
+- Iris original voice restored to af_nicole. Human Watch original widescreen correction remains separate pending work.

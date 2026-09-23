@@ -4,6 +4,13 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 p=argparse.ArgumentParser();p.add_argument('--ffmpeg',required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
 timeline=json.loads((a.output/'voice.json').read_text(encoding='utf-8-sig'))['segments']
+bulletin_path=a.output/'bulletin.json'
+production=json.loads(bulletin_path.read_text(encoding='utf-8-sig')) if bulletin_path.exists() else {}
+subtitle=production.get('introSubtitle','')
+end_seconds=0
+if production.get('endCard'):
+ end_seconds=round((float(production.get('targetDuration',timeline[-1]['end']+5))-3-timeline[-1]['end'])*25)/25
+ if not 1 <= end_seconds <= 4:raise ValueError('Narration needs timing review before the final end card')
 # Open on the presenter's complete greeting, then the ident, then the stories.
 # Split at a frame boundary without repeating or dropping narration.
 opening=round(float(timeline[0]['end'])*25)/25
@@ -37,6 +44,9 @@ for name,w,h in [('website',1920,1080),('instagram',1080,1920)]:
    f=font(size);tw=td.textlength(text,font=f);td.text(((w-tw)/2,cy+dy),text,font=f,fill=color,stroke_width=2,stroke_fill='#21152f')
   reveal=min(1,max(0,(t-.25)/.75));title.putalpha(title.getchannel('A').point(lambda x:int(x*reveal)))
   im.paste(title,(0,0),title)
+  if subtitle:
+   f=font(48 if w>1200 else 44);sw=d.textlength(subtitle,font=f)
+   ImageDraw.Draw(im).text(((w-sw)/2,cy-205),subtitle,font=f,fill='#42DFD1')
   d=ImageDraw.Draw(im);span=int(min(1,t/1.1)*min(w*.36,500));d.line((cx-span,cy+210,cx+span,cy+210),fill='#42DFD1',width=5)
   fade=min(1,t/.16,(3-t)/.24)
   if fade<1:im=Image.blend(Image.new('RGB',(w,h),'black'),im,max(0,fade))
@@ -50,5 +60,11 @@ for name,w,h in [('website',1920,1080),('instagram',1080,1920)]:
         f'[1:a]asplit[ha0][ta0];[ha0]atrim=end={opening},asetpts=PTS-STARTPTS[ha];'
         f'[ta0]atrim=start={opening},asetpts=PTS-STARTPTS[ta];'
         '[0:v]setsar=1[iv];[hv][ha][iv][0:a][tv][ta]concat=n=3:v=1:a=1[v][a]')
- subprocess.run([a.ffmpeg,'-v','error','-y','-i',str(intro),'-i',str(body),'-filter_complex',graph,'-map','[v]','-map','[a]','-c:v','libx264','-preset','fast','-crf','20','-c:a','aac','-movflags','+faststart',str(out)],check=True)
+ inputs=[]
+ if end_seconds:
+  ending=a.output/(name+'-ending.mp4')
+  subprocess.run([a.ffmpeg,'-v','error','-y','-loop','1','-framerate','25','-i',str(a.output/(name+'-intro.jpg')),'-f','lavfi','-i','anullsrc=r=48000:cl=stereo','-t',str(end_seconds),'-c:v','libx264','-pix_fmt','yuv420p','-c:a','aac',str(ending)],check=True)
+  inputs=['-i',str(ending)]
+  graph=graph.replace('[0:v]setsar=1[iv];','[0:v]setsar=1[iv];[2:v]setsar=1[ev];').replace('[tv][ta]concat=n=3','[tv][ta][ev][2:a]concat=n=4')
+ subprocess.run([a.ffmpeg,'-v','error','-y','-i',str(intro),'-i',str(body),*inputs,'-filter_complex',graph,'-map','[v]','-map','[a]','-c:v','libx264','-preset','fast','-crf','20','-c:a','aac','-movflags','+faststart',str(out)],check=True)
  subprocess.run([a.ffmpeg,'-v','error','-xerror','-i',str(out),'-f','null','-'],check=True)

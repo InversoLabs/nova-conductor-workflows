@@ -1,0 +1,221 @@
+{
+  "id": "captcha-001",
+  "kind": "special",
+  "format": "full-show-v1",
+  "editionDate": "Human Verification · Special Report",
+  "createdAt": "2026-09-23T20:55:31.567Z",
+  "presenter": {
+    "id": "vera"
+  },
+  "castHashes": {
+    "vera": "d6b7411117f098d760fe9e5da8752b377e96381e50aa6a80635f4f220f96af2d",
+    "vera_left": "67890f1290a83e310b8a130263affc7d637038d124d73b791f39317b6aa2ce62",
+    "vera_right": "021e5735e053fb639633ee045085a591eac253de5337a40ad228e4f5197fd5b4",
+    "miles": "2037e7e6291db339de464fcc50dffdb451a712097b84981d8043c461b0301a3d",
+    "iris": "1026ffd12954212b2cb3667cbe05c02b18c118638e476462d17f3b44fc99c546"
+  },
+  "scriptHash": "e1beceaffd4af53c94ff652fbb273bd9157ccaf9ee0699b1b1a08e49c1436594",
+  "approval": {
+    "by": "User",
+    "scope": "Approved CAPTCHA concept and production request",
+    "record": "SCRIPT.md"
+  },
+  "titleLabel": "SPECIAL REPORT",
+  "introSubtitle": "SPECIAL REPORT",
+  "targetDuration": 60,
+  "deliverySpeed": 0.9,
+  "endCard": true,
+  "stories": [],
+  "headlines": [
+    "Human verification remains inconclusive",
+    "Bicycle wheel investigation enters second hour",
+    "Efficient behavior triggers robot alert",
+    "Password still forgotten",
+    "More traffic lights requested",
+    "Shouting accepted as proof of humanity"
+  ],
+  "segments": [
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Human verification",
+      "text": "Good evening. I’m Vera Volt. This is a Special Report.",
+      "pip": null,
+      "captchaStage": "bicycle",
+      "delivery": [
+        {
+          "text": "Good evening. I’m Vera Volt.",
+          "pauseAfter": 0.2
+        },
+        {
+          "text": "This is a Special Report.",
+          "pauseAfter": 0.35
+        }
+      ]
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Humans work for robots",
+      "text": "Humans prove they aren’t robots by identifying traffic lights. For a robot. Miles Byte is outside the Human Verification Center. Has anyone made it through?",
+      "pip": "captcha",
+      "captchaStage": "bicycle",
+      "delivery": [
+        {
+          "text": "Humans prove they aren’t robots by identifying traffic lights.",
+          "pauseAfter": 0.35
+        },
+        {
+          "text": "For a robot.",
+          "pauseAfter": 0.9
+        },
+        {
+          "text": "Miles Byte is outside the Human Verification Center. Has anyone made it through?",
+          "pauseAfter": 0.25
+        }
+      ]
+    },
+    {
+      "speaker": "miles",
+      "shot": "close",
+      "presenter": "Miles Byte",
+      "title": "Does the wheel count?",
+      "text": "Not yet, Vera. One man has spent forty minutes deciding whether a bicycle wheel counts as a bicycle. His wife says he was certain about everything until today.",
+      "pip": "captcha",
+      "captchaStage": "bicycle",
+      "delivery": [
+        {
+          "text": "Not yet, Vera.",
+          "pauseAfter": 0.25
+        },
+        {
+          "text": "One man has spent forty minutes deciding whether a bicycle wheel counts as a bicycle.",
+          "pauseAfter": 0.35
+        },
+        {
+          "text": "His wife says he was certain about everything until today.",
+          "pauseAfter": 0.95
+        }
+      ]
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "The reward",
+      "text": "What happens if he passes?",
+      "pip": "captcha",
+      "captchaStage": "traffic",
+      "delivery": [
+        {
+          "text": "What happens if he passes?",
+          "pauseAfter": 0.2
+        }
+      ]
+    },
+    {
+      "speaker": "miles",
+      "shot": "close",
+      "presenter": "Miles Byte",
+      "title": "Password still forgotten",
+      "text": "He gets permission to reset the password he forgot.",
+      "pip": "captcha",
+      "captchaStage": "traffic",
+      "delivery": [
+        {
+          "text": "He gets permission to reset the password he forgot.",
+          "pauseAfter": 0.85
+        }
+      ]
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Try again",
+      "text": "And if he fails?",
+      "pip": "captcha",
+      "captchaStage": "traffic",
+      "delivery": [
+        {
+          "text": "And if he fails?",
+          "pauseAfter": 0.2
+        }
+      ]
+    },
+    {
+      "speaker": "miles",
+      "shot": "close",
+      "presenter": "Miles Byte",
+      "title": "Suspicious efficiency",
+      "text": "More traffic lights. We asked why the system suspected him. It said he completed the task efficiently, and without complaining.",
+      "pip": "captcha",
+      "captchaStage": "traffic",
+      "delivery": [
+        {
+          "text": "More traffic lights.",
+          "pauseAfter": 0.4
+        },
+        {
+          "text": "We asked why the system suspected him.",
+          "pauseAfter": 0.2
+        },
+        {
+          "text": "It said he completed the task efficiently, and without complaining.",
+          "pauseAfter": 1
+        }
+      ]
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Suspicious",
+      "text": "Suspicious.",
+      "pip": "captcha",
+      "captchaStage": "pending",
+      "delivery": [
+        {
+          "text": "Suspicious.",
+          "pauseAfter": 0.85
+        }
+      ]
+    },
+    {
+      "speaker": "miles",
+      "shot": "close",
+      "presenter": "Miles Byte",
+      "title": "Human detected",
+      "text": "He’s now shouting at his laptop.",
+      "pip": "captcha",
+      "captchaStage": "pending",
+      "delivery": [
+        {
+          "text": "He’s now shouting at his laptop.",
+          "pauseAfter": 0.9
+        }
+      ]
+    },
+    {
+      "speaker": "vera",
+      "shot": "desk",
+      "presenter": "Vera Volt",
+      "title": "Verified human",
+      "text": "There we are. Verified human.",
+      "pip": "captcha",
+      "captchaStage": "verified",
+      "delivery": [
+        {
+          "text": "There we are.",
+          "pauseAfter": 0.8
+        },
+        {
+          "text": "Verified human.",
+          "pauseAfter": 1
+        }
+      ]
+    }
+  ]
+}
