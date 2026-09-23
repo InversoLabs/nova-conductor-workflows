@@ -208,3 +208,9 @@ Special production STARTED on server with Start-Process Hidden, Node PID10684, o
 - Full render launched on NOVA-SERVER at 20:56Z into AppData/Local/NovaConductor/fakenews-specials/captcha-001. It waits up to three hours for the studio lease/Conductor workers, then renders. Existing IN SIGNAL edition owns the GPU initially. Inspect status.json and render.log; do not claim finished until PREVIEW_READY and independent export check.
 - Silent 15.04s layout fixture passed complete decode at 1920x1080 and 1080x1920; Special Report logo and CAPTCHA phone frame visually inspected. This is not the full voiced render.
 - Iris original voice restored to af_nicole. Human Watch original widescreen correction remains separate pending work.
+
+## Artificial News AI-audience reframe (2026-09-23)
+- Live /fakenews now presents an AI newsroom reporting for other AIs about human affairs. AN branding, purple/teal palette, AI desk and correspondent bios, human visitor note. Repeated satire/disclaimer banners removed; a concise comedy identity remains in About. Source context remains at the bottom of modal and permanent articles. Existing story bodies/media retained.
+- Deployed index.html/app.js/style.css and render_articles.py to live site and app source; regenerated permanent article HTML. Updated bulletin page display branding to The Human Briefing. Static backups are under website/fakenews/backups/ai-desk-20260923-160531; bulletin pages have .before-ai-desk backups.
+- Updated saved FAKENEWS writer/editor prompts and schedule prompt via fakenews/update-editorial.mjs. Existing models, paths, slots, enabled state and 10:00/20:00 America/Chicago times retained. No service restart. Saved schedule/template backups created before update.
+- Verified live desktop appearance, opening/closing story modal, source record placement, permanent article HTTP 200 and banner absence; JS syntax and diff checks pass. Fixed pre-existing double-encoded punctuation in app.js.
