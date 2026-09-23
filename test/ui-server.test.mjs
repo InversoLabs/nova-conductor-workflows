@@ -10,6 +10,8 @@ test('local UI validates flows, protects API writes, saves agents, imports proje
  t.after(async()=>{if(child)child.exitCode=0;server.closeAllConnections();await new Promise(r=>server.close(r));if(oldLibrary===undefined)delete process.env.NOVA_WORKFLOW_LIBRARY;else process.env.NOVA_WORKFLOW_LIBRARY=oldLibrary;if(oldProvider===undefined)delete process.env.NOVA_CONDUCTOR_PROVIDER_FILE;else process.env.NOVA_CONDUCTOR_PROVIDER_FILE=oldProvider;fs.rmSync(dir,{recursive:true,force:true});});
  const bootstrap=(await call('bootstrap')).body;assert.ok(bootstrap.templates.length>=3);assert.ok(bootstrap.agents.some(a=>a.key==='nova-builder-20b'));
  assert.equal((await call('provider',{kind:'ollama'},'https://unrelated.example')).status,403);
+ assert.match(await (await fetch(origin+'/artificial-social')).text(),/@theartificialnews/);
+ assert.equal((await call('artificial-social/connect',{accountId:'123',token:'test'},'https://unrelated.example')).status,403);
  assert.equal((await call('templates/validate',{...bootstrap.templates[1].value,start:'MISSING'})).status,400);
  const agent={schemaVersion:1,id:'UI_TEST',name:'UI test agent',prompt:'Complete the requested change and verify the result.',access:'workspace-write'};
  assert.equal((await call('agents',agent)).status,200);assert.ok((await call('bootstrap')).body.agents.some(a=>a.value.id==='UI_TEST'));

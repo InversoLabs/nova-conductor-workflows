@@ -167,3 +167,15 @@ New satire publication at https://inversolabs.us/fakenews/, Instagram handle @th
 The original IN / SIGNAL September 22 newsroom/social edition reached COMPLETE and its anchor video finished. Its schedule remains 06:00/15:00 Central. The new comedy schedule is saved for 10:00/20:00 Central but disabled until the live pilot passes.
 
 Pilot project b4dad28cd9a1822f9fa9 is in C:\Users\justi\Documents\Nova Conductor Workflow Projects\Fake News Network edition-1790118992099. Initial writer patches/PowerShell quoting failed; the revised writer returns JSON, a SAVE robot validates and writes it, and the editor still gates publication. Reopened at WRITER (run 0005); full live acceptance is pending. Website/card/intro plumbing is deployed; Instagram remains disconnected pending separate credentials for the new account. Do not claim video publication until the new anchor queue reports complete and public exports are verified.
+
+### Pilot update — September 23, 00:17 UTC
+
+@theartificialnews is verified and publishing enabled through the separate /artificial-social page. Test card verified by Instagram API: https://www.instagram.com/p/Ddm__eHEVuS/ (IMAGE, ID 18032221091851021). Account credentials are not in this repository. The user PC SSH tunnel uses localhost 18183 → server localhost 18183; a different local port fails the intentional Host/Origin validation.
+
+Pilot editor APPROVE (run 0021), article published at https://inversolabs.us/fakenews/story/87d31b4d271444f2ad80/. PUBLISH run 0022 stopped after article delivery because a dynamic circular import deadlocked the social queue. Fixed with a static import; social queue was recovered independently and the approved card published. The Conductor project remains NEEDS_ATTENTION/PUBLISH until its normal idempotent robot retry after rendering. Do not duplicate the article or clear delivery state.
+
+The independent anchor watcher automatically started edition-87d31b4d271444f2ad80 under %LOCALAPPDATA%\NovaConductor\fakenews-anchor\editions. Started 00:09:58 UTC; 45.904625 seconds of narration plus 3-second intro; navy wardrobe. At last inspection it was animating normally. Verify completed wide/vertical video and Instagram Reel before enabling the 10:00/20:00 Central schedule.
+
+Recovery guidance now carries guidanceRole so reopening WRITER does not tell EDITOR to produce JSON. Regression test covers role isolation. Draft save robot preserves parsed drafts for revision, gives exact validation errors, and fits long summaries on sentence boundaries before editorial review. Article cap is 600 words; factual context cap 1500 characters. A short question cut off from its answer is removed when fitting future summaries; the first approved pilot retains its original reviewed copy.
+
+Latest checks: 102 Node tests, 99 passed and 3 skipped; Python video-serving and publisher-retry tests passed. Subsequent focused summary-fitting test passed. New artificial-anchor status page and coordination guard are staged locally; deploy/reload after the current video finishes.

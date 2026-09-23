@@ -43,7 +43,7 @@ export function reopen(root,feedback,role='BUILDER') {
     const archive=path.join(root,'reopened-'+Date.now());fs.mkdirSync(archive);
     for(const file of ['state.json','work/REVIEW.md','work/BUILD_CHECKLIST.md'])if(fs.existsSync(path.join(root,file)))fs.copyFileSync(path.join(root,file),path.join(archive,path.basename(file)));
     if(!customWorkflow(state))fs.writeFileSync(path.join(work,'BUILD_CHECKLIST.md'),'# User feedback\n\n'+feedback.trim()+'\n\n# Build Checklist\n\n- [ ] Address the user feedback above using the existing project, verify the changes, and hand off for review.\n');
-    if(customWorkflow(state)){state.guidance=feedback.trim();state.handoff='';}
+    if(customWorkflow(state)){state.guidance=feedback.trim();state.guidanceRole=role;state.handoff='';}
     state.role=role;state.status='STOPPED';state.failures=0;state.disconnectFailures=0;state.busyRetries=0;state.deadlineRecoveries=0;state.stalledBuilds=0;state.nextRetryAt=null;state.lastBuildSignature=null;
     state.progressRecoveries=0;
     if(role==='BUILDER')state.builderMode='user'; else if(role==='PLANNER')delete state.builderMode;

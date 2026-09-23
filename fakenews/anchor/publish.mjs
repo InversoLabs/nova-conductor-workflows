@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {atomic} from '../../src/workflow.mjs';
 import {storedKey} from '../../src/credentials.mjs';
 import {config,esc} from '../scripts/newsroom.mjs';
+import {settings} from '../social/social.mjs';
 
 import {deliver} from '../../newsroom/social/instagram.mjs';
 import {InstagramReels} from '../../newsroom/anchor/instagram-reels.mjs';
@@ -27,13 +28,14 @@ export async function publishBulletin(folder){
   const lock=path.join(folder,'publish.lock');fs.writeFileSync(lock,String(process.pid),{flag:'wx'});
   const recordFile=path.join(folder,'delivery.json');let record;
   try{
-    const {assets,review}=reviewedAssets(folder),b=JSON.parse(assets['bulletin.json']),news=config(),social={enabled:false,accountId:""};
+    const {assets,review}=reviewedAssets(folder),b=JSON.parse(assets['bulletin.json']),news=config(),social=settings();
     if(!/^[a-z0-9-]{1,80}$/.test(b.id)||news.transport!=='local')throw Error('Bulletin needs a valid ID and server-local publishing');
-    // Separate account connection is pending; website publication remains enabled.
+    // This publication has a separate account and credential from IN / SIGNAL.
     const folderHash=sha(assets['bulletin.json']);
     const site=news.siteUrl.replace(/\/$/,''),url=site+'/bulletins/'+b.id+'/';
     const caption=`TAN / SATIRE with Mara Vale | ${b.editionDate}\n${b.kind==='scheduled'?'Fictional world-news comedy inspired by real sources. SATIRE.':'Launch-edition studio test: two stories from our newsroom.'}\n\n${b.stories.map(s=>s.title).join('\n')}\n\nWatch and read the sources: ${url}`;
     record=fs.existsSync(recordFile)?JSON.parse(fs.readFileSync(recordFile,'utf8')):{id:b.id,status:'preview',accountId:social.accountId,caption,bulletinHash:folderHash,videoHash:sha(assets['instagram.mp4']),createdAt:new Date().toISOString()};
+    if(record.socialStatus==='awaiting_account'&&!record.accountId&&!record.containerId&&!record.mediaId){record.accountId=social.accountId;record.status='preview';}
     if(record.accountId!==social.accountId||record.caption!==caption||record.bulletinHash!==folderHash||record.videoHash!==sha(assets['instagram.mp4']))throw Error('Existing delivery belongs to a different account or bulletin version');
     atomic(recordFile,record);
     const destination=path.join(news.remoteRoot,'public','bulletins',b.id);fs.mkdirSync(destination,{recursive:true});
@@ -54,7 +56,7 @@ export async function publishBulletin(folder){
     if(!latest||Date.parse(latest.editionCreatedAt||latest.publishedAt)<=Date.parse(b.createdAt||record.createdAt))atomic(latestFile,{id:b.id,date:b.editionDate,url,video:url+'website.mp4',title:'The Daily Nonsense',publishedAt:new Date().toISOString(),editionCreatedAt:b.createdAt||record.createdAt});
     record.websiteUrl=url;record.websiteVerifiedAt=new Date().toISOString();record.reviewedAt=review.checkedAt;atomic(recordFile,record);
     if(!social.enabled){record.status='published';record.socialStatus='awaiting_account';atomic(recordFile,record);return record;}
-    const client=new InstagramReels({...social,token:await storedKey('NOVA_INSTAGRAM_TOKEN')});
+    const client=new InstagramReels({...social,token:await storedKey('NOVA_ARTIFICIAL_INSTAGRAM_TOKEN')});
     for(let attempt=0;attempt<10;attempt++){
       try{await deliver({client,record,save:value=>atomic(recordFile,value),caption,imageUrl:url+'instagram.mp4'});break;}
       catch(error){record.lastError=error.message;atomic(recordFile,record);if(record.status!=='processing'||attempt===9)throw error;await new Promise(resolve=>setTimeout(resolve,15000));}

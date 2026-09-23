@@ -6,10 +6,16 @@ import path from 'node:path';
 import {EventEmitter} from 'node:events';
 import {initialize,run,reopen} from '../src/conductor.mjs';
 import {atomic,snapshot} from '../src/workflow.mjs';
-import {builtins,defaultAgent,oneShot,validateTemplate,validateAgent,initializeWorkflow,workflowOutcome,assertWorkflowChanges} from '../src/templates.mjs';
+import {builtins,defaultAgent,oneShot,validateTemplate,validateAgent,initializeWorkflow,workflowOutcome,assertWorkflowChanges,workflowPrompt} from '../src/templates.mjs';
 function project(t,template=builtins.writing,source){const parent=fs.mkdtempSync(path.join(os.tmpdir(),'nova-workflows-'));t.after(()=>fs.rmSync(parent,{recursive:true,force:true}));const root=path.join(parent,'project');initializeWorkflow(root,'Create a short story about a helpful robot.','test-model',template,source,initialize);return root;}
 function worker(root,act){let count=0;const starts=[];return {starts,start:async()=>{const c=new EventEmitter();c.close=()=>{};c.request=async(method,p)=>{if(method==='thread/start'){starts.push(p);return {thread:{id:'fresh-'+ ++count}};}if(method==='turn/start'){setImmediate(async()=>{try{const result=await act({root,work:path.join(root,'work'),count,p,c});if(result==='pause')return;c.emit('notice',{method:'turn/completed',params:{threadId:p.threadId,turn:{status:result?.failed?'failed':'completed',error:result?.failed?{message:result.failed}:undefined,items:[{type:'agentMessage',text:typeof result==='string'?result:''}]}}});}catch(e){c.emit('notice',{method:'turn/completed',params:{threadId:p.threadId,turn:{status:'failed',error:{message:e.message}}}});}});return {turn:{id:'turn-'+count}};}return {};};return {connection:c,url:'mock'};}};}
 const checks=async()=>({passed:true,results:[]});
+test('reopened role guidance does not leak into another role',t=>{
+ const root=project(t);reopen(root,'WRITER_ONLY_INSTRUCTION','WRITER');
+ const s=JSON.parse(fs.readFileSync(path.join(root,'state.json'),'utf8'));
+ assert.equal(s.guidanceRole,'WRITER');assert.match(workflowPrompt(s),/WRITER_ONLY_INSTRUCTION/);
+ s.role='EDITOR';assert.ok(!workflowPrompt(s).includes('WRITER_ONLY_INSTRUCTION'));
+});
 test('validator rejects unsafe, unreachable, conflicting, and endless definitions',()=>{
  assert.doesNotThrow(()=>assertWorkflowChanges({role:'BUILDER',workflow:builtins['custom-code']},{'BUILD_PLAN.md':'old'},{'BUILD_PLAN.md':'new'}));
  assert.equal(validateTemplate(builtins.writing).start,'PRODUCER');for(const template of Object.values(builtins))validateTemplate(template);validateTemplate(oneShot(defaultAgent));

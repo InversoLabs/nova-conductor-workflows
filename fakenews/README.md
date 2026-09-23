@@ -59,10 +59,16 @@ before retrying; do not delete delivery state or clear seen IDs to force reruns.
 Shared GPU recovery remains `node newsroom/anchor/recover.mjs` and refuses a live
 owner. Never stop IN / SIGNAL's worker to make room for this publication.
 
-Instagram delivery is disabled in this prototype until the user connects the
-new account. Website videos and vertical files are still published. Do not enable
-the existing IN / SIGNAL account for TAN. A separate credential/config integration
-is required when the new handle is supplied.
+Instagram delivery defaults to disabled. Connect **@theartificialnews** through
+`http://127.0.0.1:18183/artificial-social` on the server, then enable publishing.
+The form verifies the handle and saves a separate Windows-protected credential
+(`NOVA_ARTIFICIAL_INSTAGRAM_TOKEN`). Settings/outbox live under
+`%LOCALAPPDATA%\NovaConductor\artificial-social`; IN / SIGNAL's connection is unchanged.
+Website and vertical videos still publish while Instagram is disconnected.
+Existing preview cards require a manual Publish click; future approved cards and
+videos publish automatically after connection. An existing website-only video can
+be delivered after connection with `node fakenews/anchor/publish.mjs <render-folder>`.
+Delivery receipts prevent duplicate submission; do not delete them to force a retry.
 
 Run `npm test` and Python compilation for the changed publisher/compositor code.
 The real model → article → card → lip-sync → public video pilot is a separate

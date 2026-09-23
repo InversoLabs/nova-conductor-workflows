@@ -1,3 +1,4 @@
+import {queue as queueSocial} from '../social/social.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -26,13 +27,15 @@ export async function fetchSources(){
   return {fetchedAt:new Date().toISOString(),sources:all.sort((a,b)=>b.publishedAt.localeCompare(a.publishedAt)),errors};
 }
 export function validateStory(s,sources){
-  if(!s||typeof s.title!=='string'||s.title.length<15||s.title.length>180||typeof s.summary!=='string'||s.summary.length<40||s.summary.length>700)throw Error('Story requires a specific title and summary');
+  if(!s||typeof s.title!=='string'||typeof s.summary!=='string')throw Error('Provide title and summary as JSON strings.');
+  if(s.title.length<15||s.title.length>180)throw Error('Title is '+s.title.length+' characters; use 15-180.');
+  if(s.summary.length<40||s.summary.length>700)throw Error('Summary is '+s.summary.length+' characters; use 40-700 (aim for two short sentences).');
   if(!['World','Politics','Society','Science'].includes(s.category))throw Error('Invalid story category');
   if(!Array.isArray(s.paragraphs)||s.paragraphs.length<2||s.paragraphs.length>12||s.paragraphs.some(p=>typeof p!=='string'||p.length<30||p.length>2500))throw Error('Provide 2–12 complete paragraphs');
   if(!Array.isArray(s.sources)||!s.sources.length||s.sources.some(x=>!sources.some(a=>a.url===x.url)))throw Error('Story must cite the collected primary sources');
-  if(typeof s.factualSummary!=='string'||s.factualSummary.length<40||s.factualSummary.length>500)throw Error('Provide factualSummary: a short factual account separate from fictional satire');
+  if(typeof s.factualSummary!=='string'||s.factualSummary.length<40||s.factualSummary.length>1500)throw Error('Provide factualSummary as 40-1500 characters of factual context, separate from fictional satire');
   const text=[s.title,s.summary,...s.paragraphs].join(' ');if(/\b(TODO|lorem ipsum|insert (?:title|text)|as an AI language model)\b/i.test(text))throw Error('Placeholder story rejected');
-  const bodyWords=s.paragraphs.join(' ').trim().split(/\s+/).length;if(bodyWords>180)throw Error('Briefing body is '+bodyWords+' words; shorten it to at most 180 without removing citations or attribution');
+  const bodyWords=s.paragraphs.join(' ').trim().split(/\s+/).length;if(bodyWords>600)throw Error('Briefing body is '+bodyWords+' words; shorten it to at most 600 without removing citations or attribution');
   const normalize=v=>v.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();for(const match of text.matchAll(/(?:paper|study|report)\s+(?:titled|called)\s*["“]([^"”]+)["”]/gi)){if(sources.some(source=>normalize(source.title||'')===normalize(match[1])))throw Error('Do not present a blog headline as a paper title. Use the actual paper title in the source or describe the blog announcement without naming a paper');}
   const words=text.toLowerCase().match(/[a-z0-9]+/g)||[];for(const source of sources){const original=(source.excerpt||'').toLowerCase().replace(/[^a-z0-9]+/g,' ');for(let i=0;i+18<=words.length;i++)if(original.includes(words.slice(i,i+18).join(' ')))throw Error('Story copies a long source passage; rewrite it in original language');}
   return {...s,id:idFor(s.sources[0].url),sources:s.sources.map(x=>({name:sources.find(a=>a.url===x.url).name,url:x.url})),format:'BRIEFING',priority:0,publishedAt:new Date().toISOString(),imageAlt:'Fictional satirical illustration of an absurd newsroom',disclosure:'SATIRE: Fictional comedy inspired by the linked real source. Invented scenes and dialogue are jokes, not reported events.'};
@@ -91,12 +94,26 @@ export async function publish(work,{manual=false}={}){
   const result=invokePublisher(c,[incoming]);console.log(result.trim());
   const live=await fetch(c.siteUrl+'/stories.json?verify='+Date.now(),{signal:AbortSignal.timeout(15000)}).then(r=>r.json());if(!live.stories.some(a=>a.id===s.id))throw Error('Upload completed but public verification failed; inspect before retrying');
   for(const suffix of ['/story/'+s.id+'/','/images/'+s.id+'.svg']){const response=await fetch(c.siteUrl+suffix+'?verify='+Date.now(),{signal:AbortSignal.timeout(15000)});if(!response.ok)throw Error('Published article or illustration is not publicly reachable');}
-  fs.writeFileSync(path.join(work,'PUBLISHED.json'),JSON.stringify({id:s.id,url:c.siteUrl+'/story/'+s.id+'/',verifiedAt:new Date().toISOString()},null,2));console.log('Public story verified: '+c.siteUrl+'/story/'+s.id+'/');
+  fs.writeFileSync(path.join(work,'PUBLISHED.json'),JSON.stringify({id:s.id,url:c.siteUrl+'/story/'+s.id+'/',verifiedAt:new Date().toISOString()},null,2));console.log('Public story verified: '+c.siteUrl+'/story/'+s.id+'/'); await queueSocial(work);
 }
-export function draftFromHandoff(text,sources){
+function parseDraftHandoff(text){
   const blocks=[...text.matchAll(/```json\s*\n([\s\S]*?)\n```/g)];
   if(blocks.length!==1)throw Error('Return exactly one complete JSON code block after # DONE.');
-  const draft=JSON.parse(blocks[0][1]);
+  return JSON.parse(blocks[0][1]);
+}
+export function fitSummary(text){
+  if(typeof text!=='string'||text.length<=700)return text;
+  let fitted='';const included=[];
+  for(const {segment} of new Intl.Segmenter('en',{granularity:'sentence'}).segment(text)){
+    if((fitted+segment).trim().length>700)break;
+    fitted+=segment;included.push(segment);
+  }
+  const last=included.at(-1)?.trim();
+  if(last?.endsWith('?')&&last.length<35){included.pop();fitted=included.join('');}
+  return fitted.trim().length>=40?fitted.trim():text;
+}
+export function draftFromHandoff(text,sources){
+  const draft=parseDraftHandoff(text);
   validateStory(draft,sources);
   return draft;
 }
@@ -106,9 +123,11 @@ export function saveDraft(work){
   if(writer?.role!=='WRITER'||writer.outcome!=='DONE')throw Error('Draft must immediately follow the comedy writer.');
   const text=fs.readFileSync(path.join(root,'runs',writer.id,'handoff.md'),'utf8');
   const sources=JSON.parse(fs.readFileSync(path.join(work,'SOURCES.json'),'utf8')).sources;
-  const draft=draftFromHandoff(text,sources);
+  const draft=parseDraftHandoff(text);
   const target=path.join(work,'STORY.json');
+  draft.summary=fitSummary(draft.summary);
   fs.writeFileSync(target,JSON.stringify(draft,null,2),'utf8');
+  try{validateStory(draft,sources);}catch(error){throw Error('Use STORY.json only as reference. Do not edit any files. Return # DONE followed by the full corrected JSON code block in your reply. Required correction: '+error.message);}
   console.log('Story JSON saved and validated; editorial approval is still required.');
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
