@@ -11,3 +11,5 @@ Export repair: regular newsroom and fakenews preview commands pass --audio voice
 Regression check: a one-second video with 500 Hz audio and separate 9 kHz source WAV was composed in both layouts. Decoded outputs must have their dominant frequency at 9 kHz. Both layouts passed and decoded successfully.
 
 Public files are uniformly encoded AAC 192k/48k in audio-only MP4 for the existing range-enabled media route. Lossless normalized WAV masters remain in the lab. Scripts live in app.js to comply with the site's Content Security Policy. Static deploy directory is newsroom/public/voice-test.
+
+User selected B on 2026-09-25. Production newsroom/anchor/voice.py now uses the tested sentence split, 0.42s sentence pause and 0.25s segment pause, speed 1.0 and original voice. Both regular channels call this shared generator. Nonfinite, empty, silent or clipping waveforms stop generation. Both regular compositors require --audio; they cannot silently use animation audio. Custom specials retain their hand-directed delivery.

@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 p = argparse.ArgumentParser()
 p.add_argument('--ffmpeg', required=True)
 p.add_argument('--input', required=True, type=Path)
-p.add_argument('--audio', type=Path, help='Original narration WAV; bypass animation audio resampling')
+p.add_argument('--audio', required=True, type=Path, help='Original narration WAV; bypass animation audio resampling')
 p.add_argument('--output', required=True, type=Path)
 p.add_argument('--headline', default='The stories shaping artificial intelligence')
 p.add_argument('--label', default='THE AI BRIEF')
@@ -147,3 +147,4 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
     outputs.append({'file': str(out), 'width': w, 'height': h, 'bytes': out.stat().st_size, 'duration': duration, 'decoded': True})
 (a.output/'exports.json').write_text(json.dumps(outputs, indent=2), encoding='utf-8')
 print(json.dumps(outputs))
+
