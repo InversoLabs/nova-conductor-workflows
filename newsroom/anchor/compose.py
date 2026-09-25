@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 p = argparse.ArgumentParser()
 p.add_argument('--ffmpeg', required=True)
 p.add_argument('--input', required=True, type=Path)
+p.add_argument('--audio', type=Path, help='Original narration WAV; bypass animation audio resampling')
 p.add_argument('--output', required=True, type=Path)
 p.add_argument('--headline', default='The stories shaping artificial intelligence')
 p.add_argument('--label', default='THE AI BRIEF')
@@ -125,12 +126,14 @@ for name, w, h in [('website', 1920, 1080), ('instagram', 1080, 1920)]:
              f'[2:v]crop={w-label_w}:{ticker_h}:x=mod(t*{ticker_speed:.3f}\\,{period}):y=0[scroll];'
              f'[{panel}][scroll]overlay={label_w}:{ticker_y}:shortest=1,format=yuv420p[v]')
     title_inputs = [arg for title_file in title_files for arg in ['-loop', '1', '-framerate', '25', '-i', str(title_file)]]
+    audio_inputs = ['-i', str(a.audio)] if a.audio else []
+    audio_map = f'{3+len(title_files)}:a:0' if a.audio else '0:a:0'
     subprocess.run([a.ffmpeg, '-y', '-i', str(a.input), '-i', str(plate),
                     '-loop', '1', '-framerate', '25', '-i', str(ticker),
-                    *title_inputs,
-                    '-filter_complex', graph, '-map', '[v]', '-map', '0:a:0',
+                    *title_inputs, *audio_inputs,
+                    '-filter_complex', graph, '-map', '[v]', '-map', audio_map,
                     '-c:v', 'libx264', '-preset', 'fast', '-crf', '20', '-r', '25',
-                    '-c:a', 'aac', '-b:a', '128k', '-ar', '48000',
+                    '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-shortest',
                     '-movflags', '+faststart', str(out)], check=True)
     # Decode all frames/audio to catch truncated or invalid exports.
     subprocess.run([a.ffmpeg, '-v', 'error', '-xerror', '-i', str(out), '-f', 'null', '-'], check=True)

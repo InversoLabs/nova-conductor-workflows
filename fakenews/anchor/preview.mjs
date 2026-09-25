@@ -55,8 +55,9 @@ try{
     atomic(path.join(output,'headlines.json'),latest.map(story=>story.title));
     atomic(path.join(output,'ticker-sources.json'),{fetchedAt:new Date().toISOString(),stories:latest});
   }
-  await run(path.join(runtime,'face/Scripts/python.exe'),[path.join(here,'compose.py'),'--ffmpeg',path.join(runtime,'bin/ffmpeg.exe'),'--input',path.join(result,masters[0]),'--output',output,'--label','THE DAILY NONSENSE',...(bulletinFile?['--timeline-json',path.join(output,'voice.json'),'--headlines-json',path.join(output,'headlines.json')]:[])]);
+  await run(path.join(runtime,'face/Scripts/python.exe'),[path.join(here,'compose.py'),'--ffmpeg',path.join(runtime,'bin/ffmpeg.exe'),'--input',path.join(result,masters[0]),'--audio',path.join(output,'voice.wav'),'--output',output,'--label','THE DAILY NONSENSE',...(bulletinFile?['--timeline-json',path.join(output,'voice.json'),'--headlines-json',path.join(output,'headlines.json')]:[])]);
   fs.copyFileSync(path.join(here,'preview.html'),path.join(output,'index.html'));
   status.status='PREVIEW_READY';status.finishedAt=new Date().toISOString();save();
   console.log(JSON.stringify(status));
 }catch(error){status.status='FAILED';status.error=error.message;save();console.error(error.message);process.exitCode=1;}
+
