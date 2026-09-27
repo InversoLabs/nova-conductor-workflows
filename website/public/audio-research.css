@@ -3,3 +3,5 @@
 .nhi-subtitle{display:block;font-size:clamp(16px,2.5vw,30px);letter-spacing:-.02em;line-height:1.4;margin-top:22px}.nhi-product{border-radius:12px;border-color:#ffffff20}.home-research .nhi-product{aspect-ratio:5/3;object-fit:contain;background:#101510}
 
 .beta-download{margin:0 0 35px}.beta-download p{font:12px/1.8 monospace;color:#a4ad98;margin-top:16px}.beta-download .button{flex-wrap:wrap;gap:25px}
+
+.nhi-audio{margin:0 0 38px;padding:25px;border:1px solid #d4f78d30;background:#191e16;border-radius:8px}.nhi-audio h3{font-size:23px;margin:12px 0 20px}.nhi-audio audio{display:block;width:100%;color-scheme:dark}.nhi-audio p{font:11px/1.7 monospace;color:#a4ad98;margin:18px 0 0}
