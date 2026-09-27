@@ -12,6 +12,9 @@ legacy = RegistryAuthApp(load_public_registry_identity(ROOT / 'legacy/config/mcp
 FILES = {'/': ('index.html', 'text/html; charset=utf-8'), '/style.css': ('style.css', 'text/css; charset=utf-8'), '/main.js': ('main.js', 'text/javascript; charset=utf-8'), '/favicon.svg': ('favicon.svg', 'image/svg+xml')}
 FILES['/conductor'] = FILES['/conductor/'] = ('conductor.html', 'text/html; charset=utf-8')
 FILES['/products.css'] = ('products.css', 'text/css; charset=utf-8')
+FILES['/designed-not-cloned'] = FILES['/designed-not-cloned/'] = ('designed-not-cloned.html', 'text/html; charset=utf-8')
+FILES['/audio-research.css'] = ('audio-research.css', 'text/css; charset=utf-8')
+FILES['/distortion.svg'] = ('distortion.svg', 'image/svg+xml')
 FILES['/favicon.ico'] = FILES['/favicon.svg']
 ARCHIVE = LANDING_HTML.replace(b'<body>', b'<body><aside style="padding:16px 6%;background:#e4edce;color:#243018;font:14px/1.5 system-ui">Archived page &mdash; retained as an earlier chapter. Product availability and pricing shown below are historical, not a current offer. <a href="/" style="color:inherit;text-decoration:underline">Visit the new Inverso Labs homepage &rarr;</a></aside>', 1)
 
@@ -48,7 +51,7 @@ def app(environ, start_response):
             return respond(environ, start_response, b'{"status":"ok","site":"inversolabs-homepage"}', 'application/json')
         if path == '/robots.txt':
             return respond(environ, start_response, b'User-agent: *\nAllow: /\nSitemap: https://inversolabs.us/sitemap.xml\n', 'text/plain')
-        return respond(environ, start_response, b'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://inversolabs.us/</loc></url><url><loc>https://inversolabs.us/archive/</loc></url><url><loc>https://inversolabs.us/conductor/</loc></url><url><loc>https://inversolabs.us/newsroom/</loc></url></urlset>', 'application/xml')
+        return respond(environ, start_response, b'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://inversolabs.us/</loc></url><url><loc>https://inversolabs.us/designed-not-cloned/</loc></url><url><loc>https://inversolabs.us/archive/</loc></url><url><loc>https://inversolabs.us/conductor/</loc></url><url><loc>https://inversolabs.us/newsroom/</loc></url></urlset>', 'application/xml')
     return legacy(environ, start_response)
 
 class Server(ThreadingMixIn, WSGIServer):
