@@ -43,6 +43,9 @@ def app(environ, start_response):
             return serve_video(environ, start_response, target)
         return respond(environ, start_response, target.read_bytes(), mimetypes.guess_type(target.name)[0] or 'application/octet-stream')
 
+    if path == '/nhi137-demo.mp3' and environ['REQUEST_METHOD'] in {'GET', 'HEAD'}:
+        return serve_video(environ, start_response, ROOT / 'public' / 'nhi137-demo.mp3', 'audio/mpeg')
+
     if path in FILES or path in {'/archive', '/archive/', '/healthz', '/robots.txt', '/sitemap.xml'}:
         if environ['REQUEST_METHOD'] not in {'GET', 'HEAD'}:
             return respond(environ, start_response, b'Method not allowed', 'text/plain', '405 Method Not Allowed')

@@ -1,11 +1,11 @@
 """Stream MP4 files with byte ranges for seeking and remote video ingestion."""
 import re
 
-def serve_video(environ, start_response, target):
+def serve_video(environ, start_response, target, content_type='video/mp4'):
     size = target.stat().st_size
     begin, end, status = 0, size - 1, '200 OK'
     value = environ.get('HTTP_RANGE', '')
-    headers = [('Content-Type', 'video/mp4'), ('Accept-Ranges', 'bytes'),
+    headers = [('Content-Type', content_type), ('Accept-Ranges', 'bytes'),
                ('Cache-Control', 'public, max-age=3600'), ('X-Content-Type-Options', 'nosniff')]
     if value:
         match = re.fullmatch(r'bytes=(\d*)-(\d*)', value)
