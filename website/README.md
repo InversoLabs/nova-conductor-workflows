@@ -17,3 +17,7 @@ harmonics, intermodulation and playing response. Development status is explicit.
 Origin restart was denied by automatic approval review. Live homepage was restored
 to its previous version to avoid dead navigation. After an authorized origin restart,
 upload public/index.html, then verify page and assets at desktop/mobile widths.
+
+Deployment completed after user-authorized restart. Public homepage, project page,
+stylesheet and SVG all returned HTTP 200. Origin health and newsroom route passed.
+The homepage now links to /designed-not-cloned/ and leads with the new project.
