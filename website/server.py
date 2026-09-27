@@ -16,6 +16,7 @@ FILES['/designed-not-cloned'] = FILES['/designed-not-cloned/'] = ('designed-not-
 FILES['/audio-research.css'] = ('audio-research.css', 'text/css; charset=utf-8')
 FILES['/distortion.svg'] = ('distortion.svg', 'image/svg+xml')
 FILES['/nhi137.jpg'] = ('nhi137.jpg', 'image/jpeg')
+FILES['/downloads/NHI137-0.1.2-macOS-Intel.zip'] = ('NHI137-0.1.2-macOS-Intel.zip', 'application/zip')
 FILES['/favicon.ico'] = FILES['/favicon.svg']
 ARCHIVE = LANDING_HTML.replace(b'<body>', b'<body><aside style="padding:16px 6%;background:#e4edce;color:#243018;font:14px/1.5 system-ui">Archived page &mdash; retained as an earlier chapter. Product availability and pricing shown below are historical, not a current offer. <a href="/" style="color:inherit;text-decoration:underline">Visit the new Inverso Labs homepage &rarr;</a></aside>', 1)
 
