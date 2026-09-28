@@ -17,8 +17,7 @@ FILES['/audio-research.css'] = ('audio-research.css', 'text/css; charset=utf-8')
 FILES['/distortion.svg'] = ('distortion.svg', 'image/svg+xml')
 FILES['/nhi137.jpg'] = ('nhi137.jpg', 'image/jpeg')
 FILES['/downloads/NHI137-0.1.2-macOS-Intel.zip'] = ('NHI137-0.1.2-macOS-Intel.zip', 'application/zip')
-FILES['/downloads/NHI137-0.1.2-macOS-Universal.zip'] = ('NHI137-0.1.2-macOS-Universal.zip', 'application/zip')
-FILES['/nhi137-tight-bite-lead.wav'] = ('nhi137-tight-bite-lead.wav', 'audio/wav')
+FILES['/downloads/NHI137-0.2.1-macOS-Universal.zip'] = ('NHI137-0.2.1-macOS-Universal.zip', 'application/zip')
 FILES['/favicon.ico'] = FILES['/favicon.svg']
 ARCHIVE = LANDING_HTML.replace(b'<body>', b'<body><aside style="padding:16px 6%;background:#e4edce;color:#243018;font:14px/1.5 system-ui">Archived page &mdash; retained as an earlier chapter. Product availability and pricing shown below are historical, not a current offer. <a href="/" style="color:inherit;text-decoration:underline">Visit the new Inverso Labs homepage &rarr;</a></aside>', 1)
 
@@ -43,8 +42,8 @@ def app(environ, start_response):
             return serve_video(environ, start_response, target)
         return respond(environ, start_response, target.read_bytes(), mimetypes.guess_type(target.name)[0] or 'application/octet-stream')
 
-    if path == '/nhi137-demo.mp3' and environ['REQUEST_METHOD'] in {'GET', 'HEAD'}:
-        return serve_video(environ, start_response, ROOT / 'public' / 'nhi137-demo.mp3', 'audio/mpeg')
+    if path in {'/nhi137-demo.mp3', '/nhi137-tight-bite-lead.wav'}:
+        return respond(environ, start_response, b'Audio sample removed', 'text/plain', '410 Gone')
 
     if path in FILES or path in {'/archive', '/archive/', '/healthz', '/robots.txt', '/sitemap.xml'}:
         if environ['REQUEST_METHOD'] not in {'GET', 'HEAD'}:
